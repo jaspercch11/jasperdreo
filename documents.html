@@ -70,7 +70,10 @@
   <!-- Upload Modal -->
   <div id="uploadModal" class="modal" style="display: none;">
     <div class="modal-content styled-form">
-      <h3>📁 Upload Document</h3>
+      <div class="modal-header">
+        <h3>📁 Upload Document</h3>
+        <button class="close-btn" type="button" onclick="closeModal()">✕</button>
+      </div>
       <form id="uploadForm" enctype="multipart/form-data">
         <input type="text" name="document_name" placeholder="Document title" required />
         <select name="owner_dept" required>
@@ -100,7 +103,10 @@
   <!-- View Modal -->
   <div id="viewModal" class="modal" style="display:none;">
     <div class="modal-content styled-form">
-      <h3>📄 Document Details</h3>
+      <div class="modal-header">
+        <h3>📄 Document Details</h3>
+        <button class="close-btn" type="button" onclick="closeViewModal()">✕</button>
+      </div>
       <p><strong>Document Name:</strong> <span id="viewDocName"></span></p>
       <p><strong>Department Owner:</strong> <span id="viewOwner"></span></p>
       <p><strong>Status:</strong> <span id="viewStatus"></span></p>
@@ -197,9 +203,32 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       loadDocuments();
+
+      const uploadModalEl = document.getElementById('uploadModal');
+      const viewModalEl = document.getElementById('viewModal');
+
       document.querySelector('.buttons .add').addEventListener('click', () => {
-        document.getElementById('uploadModal').style.display = 'flex';
+        uploadModalEl.style.display = 'flex';
       });
+
+      // Close when clicking outside the modal content
+      [uploadModalEl, viewModalEl].forEach((modalEl) => {
+        modalEl.addEventListener('click', (e) => {
+          if (e.target === modalEl) {
+            if (modalEl === uploadModalEl) closeModal();
+            if (modalEl === viewModalEl) closeViewModal();
+          }
+        });
+      });
+
+      // Close on ESC key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          if (uploadModalEl.style.display === 'flex') closeModal();
+          if (viewModalEl.style.display === 'flex') closeViewModal();
+        }
+      });
+
       document.getElementById('uploadForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);

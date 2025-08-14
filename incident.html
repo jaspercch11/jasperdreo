@@ -48,7 +48,7 @@
       <div class="card">
         <div class="card-content">
           <span>Open Incidents</span>
-          <h3>24</h3>
+          <h3 id="cardOpen">0</h3>
         </div>
         <div class="card-icon-box blue">
           <img src="https://img.icons8.com/color/48/000000/error--v1.png" />
@@ -57,7 +57,7 @@
       <div class="card">
         <div class="card-content">
           <span>Critical Priority</span>
-          <h3>8</h3>
+          <h3 id="cardCritical">0</h3>
         </div>
         <div class="card-icon-box red">
           <img src="https://img.icons8.com/color/48/000000/high-priority.png" />
@@ -66,7 +66,7 @@
       <div class="card">
         <div class="card-content">
           <span>In Progress</span>
-          <h3>12</h3>
+          <h3 id="cardInProgress">0</h3>
         </div>
         <div class="card-icon-box yellow">
           <img src="https://img.icons8.com/color/48/000000/time-machine.png" />
@@ -75,7 +75,7 @@
       <div class="card">
         <div class="card-content">
           <span>Resolved</span>
-          <h3>42</h3>
+          <h3 id="cardResolved">0</h3>
         </div>
         <div class="card-icon-box green">
           <img src="https://img.icons8.com/color/48/000000/checkmark--v1.png" />
@@ -176,6 +176,7 @@
       const tbody = document.getElementById("incident-table-body");
       tbody.innerHTML = "";
       const filtered = applyIncidentFilters(allIncidents);
+      updateCards(filtered);
       filtered.forEach(row => {
         tbody.innerHTML += `
           <tr>
@@ -190,6 +191,35 @@
           </tr>
         `;
       });
+    }
+
+    function updateCards(rows) {
+      // Normalize helper
+      const norm = (v) => (v || '').toLowerCase();
+      const counts = {
+        open: 0,
+        critical: 0,
+        inProgress: 0,
+        resolved: 0,
+      };
+
+      rows.forEach(r => {
+        const status = norm(r.status);
+        const severity = norm(r.severity_level);
+        if (status === 'open') counts.open += 1;
+        if (severity === 'critical') counts.critical += 1;
+        if (status === 'in progress' || status === 'investigating' || status === 'progress') counts.inProgress += 1;
+        if (status === 'resolved') counts.resolved += 1;
+      });
+
+      const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = String(value);
+      };
+      setText('cardOpen', counts.open);
+      setText('cardCritical', counts.critical);
+      setText('cardInProgress', counts.inProgress);
+      setText('cardResolved', counts.resolved);
     }
 
     function openFilterModal() {

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>ComplyTeam Dashboard</title>
@@ -18,7 +17,7 @@
       <nav>
         <ul>
           <li class="active"><span>🏠</span> <a href="regulatory.html">Dashboard</a></li>
-            <li><span>🔍</span> <a href="audit.html">Audit Logs</a></li>
+            <li><span>🔍</span> <a href="audit.html">Audits</a></li>
             <li><span>⚠️</span> <a href="findings.html">Findings</a></li>
             <li><span>📁</span> <a href="documents.html">Documents</a></li>
             <li><span>🚩</span> <a href="incident.html">Incidents</a></li>
@@ -163,57 +162,57 @@
         <div class="grid">
             <div class="badge-item">
             <div class="card-badge">
-                <img src="img/SOX.png" alt="SOX" class="logo" />
+                <img src="img/SOX.png" alt="SOX" class="badge-logo" />
                 <div class="label">SOX - SARBANES-OXLEY ACT</div>
             </div>
             </div>
 
             <div class="badge-item">
             <div class="card-badge">
-                <img src="img/AML.png" alt="AML" class="logo" />
+                <img src="img/AML.png" alt="AML" class="badge-logo" />
                 <div class="label">AML - ANTI-MONEY LAUNDERING</div>
             </div>
             </div>
 
              <div class="badge-item">
             <div class="card-badge">
-                <img src="img/BIR.png" alt="AML" class="logo" />
-                <div class="label">AML - ANTI-MONEY LAUNDERING</div>
+                <img src="img/BIR.png" alt="BIR" class="badge-logo" />
+                <div class="label">BIR - BUREAU OF INTERNAL REVENUE</div>
             </div>
             </div>
 
              <div class="badge-item">
             <div class="card-badge">
-                <img src="img/ISO.png" alt="AML" class="logo" />
-                <div class="label">AML - ANTI-MONEY LAUNDERING</div>
+                <img src="img/ISO.png" alt="ISO" class="badge-logo" />
+                <div class="label">ISO - INTERNATIONAL STANDARDS</div>
             </div>
             </div>
 
              <div class="badge-item">
             <div class="card-badge">
-                <img src="img/GDPR.png" alt="AML" class="logo" />
-                <div class="label">AML - ANTI-MONEY LAUNDERING</div>
+                <img src="img/GDPR.png" alt="GDPR" class="badge-logo" />
+                <div class="label">GDPR - GENERAL DATA PROTECTION REGULATION</div>
             </div>
             </div>
 
              <div class="badge-item">
             <div class="card-badge">
-                <img src="img/FDA.png" alt="AML" class="logo" />
-                <div class="label">AML - ANTI-MONEY LAUNDERING</div>
+                <img src="img/FDA.png" alt="FDA" class="badge-logo" />
+                <div class="label">FDA - FOOD AND DRUG ADMINISTRATION</div>
             </div>
             </div>
 
              <div class="badge-item">
             <div class="card-badge">
-                <img src="img/ECA.png" alt="AML" class="logo" />
-                <div class="label">AML - ANTI-MONEY LAUNDERING</div>
+                <img src="img/ECA.png" alt="ECA" class="badge-logo" />
+                <div class="label">ECA - ENVIRONMENTAL COMPLIANCE AUDIT</div>
             </div>
             </div>
 
              <div class="badge-item">
             <div class="card-badge">
-                <img src="img/DPA.png" alt="AML" class="logo" />
-                <div class="label">AML - ANTI-MONEY LAUNDERING</div>
+                <img src="img/DPA.png" alt="DPA" class="badge-logo" />
+                <div class="label">DPA - DATA PRIVACY ACT</div>
             </div>
             </div>
 
@@ -225,7 +224,6 @@
 
         </section>
     </div>
-    <script src="script.js"></script> 
     <script>
         const ctx = document.getElementById('complianceChart').getContext('2d');
         const complianceChart = new Chart(ctx, {

@@ -219,20 +219,19 @@
       tbody.innerHTML = "";
       const filtered = applyIncidentFilters(allIncidents);
       updateCards(filtered);
-      filtered.forEach(row => {
-        tbody.innerHTML += `
-          <tr data-incident-id="${row.incident_id}">
-            <td>${row.incident_type}</td>
-            <td>${row.date_reported}</td>
-            <td><span class="status-${(row.status || '').toLowerCase().replace(/\s+/g, '-')}">${row.status || '—'}</span></td>
-            <td>${row.severity_level}</td>
-            <td>
-              <button class="action-btn view-btn">View</button>
-              <button class="action-btn edit-btn" data-action="edit-status">Edit</button>
-            </td>
-          </tr>
-        `;
-      });
+      const rowsHtml = filtered.map(row => `
+        <tr data-incident-id="${row.incident_id}">
+          <td>${row.incident_type || '—'}</td>
+          <td>${row.date_reported || '—'}</td>
+          <td><span class="status-${(row.status || '').toLowerCase().replace(/\s+/g, '-')}">${row.status || '—'}</span></td>
+          <td>${row.severity_level || '—'}</td>
+          <td>
+            <button class="action-btn view-btn">View</button>
+            <button class="action-btn edit-btn" data-action="edit-status">Edit</button>
+          </td>
+        </tr>
+      `).join('');
+      tbody.innerHTML = rowsHtml;
     }
 
     function updateCards(rows) {

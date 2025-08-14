@@ -14,7 +14,15 @@ const PORT = 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname));
+app.use(express.static(__dirname, { index: false }));
+
+// Serve HTML pages explicitly
+app.get(['/','/index.html'], (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/incident.html', (req, res) => res.sendFile(path.join(__dirname, 'incident.html')));
+app.get('/documents.html', (req, res) => res.sendFile(path.join(__dirname, 'documents.html')));
+app.get('/audit.html', (req, res) => res.sendFile(path.join(__dirname, 'audit.html')));
+app.get('/regulatory.html', (req, res) => res.sendFile(path.join(__dirname, 'regulatory.html')));
+app.get('/findings.html', (req, res) => res.sendFile(path.join(__dirname, 'findings.html')));
 
 // ===== DB Connection =====
 const pool = new Pool({
@@ -220,11 +228,18 @@ app.post("/audits", async (req, res) => {
 app.get("/api/incidents", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM incidents ORDER BY incident_id ASC");
+    const toDateStr = (value) => {
+      if (!value) return null;
+      try {
+        const d = value instanceof Date ? value : new Date(value);
+        return isNaN(d.getTime()) ? String(value) : d.toISOString().split("T")[0];
+      } catch {
+        return String(value);
+      }
+    };
     const formattedRows = result.rows.map((row) => ({
       ...row,
-      date_reported: row.date_reported
-        ? row.date_reported.toISOString().split("T")[0]
-        : null,
+      date_reported: toDateStr(row.date_reported),
     }));
     res.json(formattedRows);
   } catch (error) {

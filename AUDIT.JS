@@ -83,18 +83,7 @@
       document.getElementById("openFindings").textContent = openFindings;
       document.getElementById("highRiskIssues").textContent = highRiskIssues;
 
-      // Populate filter department options
-      const deptSelect = document.getElementById('auditFilterDept');
-      if (deptSelect) {
-        const depts = Array.from(new Set(audits.map(a => a.dept_audited).filter(Boolean)));
-        depts.sort((a,b) => a.localeCompare(b));
-        depts.forEach(d => {
-          const opt = document.createElement('option');
-          opt.value = d;
-          opt.textContent = d;
-          deptSelect.appendChild(opt);
-        });
-      }
+      // Skip populating dept options dynamically; static list is provided in HTML
 
     } catch (err) {
       console.error("Error fetching audits:", err);
@@ -244,6 +233,14 @@ window.addEventListener('DOMContentLoaded', () => {
 function closeAuditFilterModal() {
   const modal = document.getElementById('auditFilterModal');
   if (modal) modal.style.display = 'none';
+}
+
+function resetAuditFilters() {
+  auditFilters = { dept: '', status: '' };
+  const form = document.getElementById('auditFilterForm');
+  if (form) form.reset();
+  renderAudits();
+  closeAuditFilterModal();
 }
 
 /* ============================================

@@ -145,6 +145,23 @@
     </div>
     </div>
  
+   <!-- View Incident Modal -->
+   <div id="viewIncidentModal" class="modal" style="display: none;">
+     <div class="modal-content styled-form">
+       <div class="modal-header">
+         <h3>📄 Incident Details</h3>
+         <button class="close-btn" type="button" onclick="closeViewModal()">✕</button>
+       </div>
+       <p><strong>Incident Type:</strong> <span id="viewIncidentType"></span></p>
+       <p><strong>Date Reported:</strong> <span id="viewDateReported"></span></p>
+       <p><strong>Status:</strong> <span id="viewStatus"></span></p>
+       <p><strong>Severity:</strong> <span id="viewSeverity"></span></p>
+       <p><strong>Department:</strong> <span id="viewDepartment"></span></p>
+       <p><strong>Description:</strong> <span id="viewDescription"></span></p>
+       <p><strong>Evidence:</strong> <span id="viewEvidence"></span></p>
+     </div>
+   </div>
+ 
    <!-- Edit Status Modal -->
    <div id="editStatusModal" class="modal" style="display: none;">
      <div class="modal-content styled-form">
@@ -281,6 +298,10 @@
       editingIncidentId = null;
     }
 
+    function closeViewModal() {
+      document.getElementById('viewIncidentModal').style.display = 'none';
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       loadIncidents();
 
@@ -297,6 +318,7 @@
         if (e.key === 'Escape') {
           if (filterModal.style.display === 'flex') closeFilterModal();
           if (document.getElementById('editStatusModal').style.display === 'flex') closeEditModal();
+          if (document.getElementById('viewIncidentModal').style.display === 'flex') closeViewModal();
         }
       });
 
@@ -340,6 +362,30 @@
           console.error('Failed to update status:', err);
           alert('Failed to update status');
         }
+      });
+
+      // View button behavior
+      document.getElementById('incident-table-body').addEventListener('click', (e) => {
+        const viewBtn = e.target.closest('button.view-btn');
+        if (!viewBtn) return;
+        const tr = viewBtn.closest('tr');
+        const id = tr && tr.getAttribute('data-incident-id');
+        if (!id) return;
+        const incident = allIncidents.find(x => String(x.incident_id) === String(id));
+        if (!incident) return;
+        document.getElementById('viewIncidentType').textContent = incident.incident_type || '—';
+        document.getElementById('viewDateReported').textContent = incident.date_reported || '—';
+        document.getElementById('viewStatus').textContent = incident.status || '—';
+        document.getElementById('viewSeverity').textContent = incident.severity_level || '—';
+        document.getElementById('viewDepartment').textContent = incident.department || '—';
+        document.getElementById('viewDescription').textContent = incident.description || '—';
+        document.getElementById('viewEvidence').textContent = incident.evidence ? incident.evidence : '—';
+        document.getElementById('viewIncidentModal').style.display = 'flex';
+      });
+
+      const viewModal = document.getElementById('viewIncidentModal');
+      viewModal.addEventListener('click', (e) => {
+        if (e.target === viewModal) closeViewModal();
       });
     });
   </script>

@@ -379,7 +379,12 @@
         document.getElementById('viewSeverity').textContent = incident.severity_level || '—';
         document.getElementById('viewDepartment').textContent = incident.department || '—';
         document.getElementById('viewDescription').textContent = incident.description || '—';
-        document.getElementById('viewEvidence').textContent = incident.evidence ? incident.evidence : '—';
+        const evSpan = document.getElementById('viewEvidence');
+        if (incident.evidence) {
+          evSpan.innerHTML = `<a href="/api/incidents/${incident.incident_id}/evidence">Download</a>`;
+        } else {
+          evSpan.textContent = '—';
+        }
         document.getElementById('viewIncidentModal').style.display = 'flex';
       });
 

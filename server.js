@@ -268,6 +268,21 @@ app.put('/api/incidents/:id/status', async (req, res) => {
   }
 });
 
+// Download incident evidence
+app.get('/api/incidents/:id/evidence', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT evidence FROM incidents WHERE incident_id = $1', [req.params.id]);
+    if (!rows.length || !rows[0].evidence) return res.status(404).send('Evidence not found');
+    const evidenceFile = rows[0].evidence;
+    const filePath = path.join(uploadDir, evidenceFile);
+    if (!fs.existsSync(filePath)) return res.status(404).send('File not found');
+    res.download(filePath, evidenceFile);
+  } catch (err) {
+    console.error('Evidence download error:', err);
+    res.status(500).send('Server error');
+  }
+});
+
 // ===== START SERVER =====
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);

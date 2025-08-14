@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard - ComplyTeam</title>
+  <link rel="stylesheet" href="css/regulatory.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="sidebar">
+    <div>
+      <div class="logo">
+        <img src="img/LOGO.png" alt="Logo" />
+        <strong>SkinBloom</strong>
+      </div>
+      <nav>
+        <ul>
+          <li class="active"><span>🏠</span> <a href="dashboard.html">Dashboard</a></li>
+          <li><span>🔍</span> <a href="audit.html">Audits</a></li>
+          <li><span>⚠️</span> <a href="findings.html">Findings</a></li>
+          <li><span>📁</span> <a href="documents.html">Documents</a></li>
+          <li><span>🚩</span> <a href="incident.html">Incidents</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="user">
+      <span>👤</span>
+      <div>
+        <strong>Jasper John Dreo</strong>
+        <small>Compliance</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="header">
+      Executive Dashboard
+      <div class="search">
+        <input type="text" placeholder="Search..." />
+        <span>🔔</span>
+      </div>
+    </div>
+
+    <section class="stats">
+      <div class="card blue">Total Audits This Year <span id="totalAuditsMetric">0</span></div>
+      <div class="card yellow">Upcoming Audits <span id="upcomingAuditsMetric">0</span></div>
+      <div class="card red">Open Incidents <span id="openIncidentsMetric">0</span></div>
+      <div class="card green">Pending Documents <span id="pendingDocsMetric">0</span></div>
+    </section>
+
+    <section class="content">
+      <div class="row">
+        <div class="left">
+          <h2>Audit Status Summary</h2>
+          <canvas id="auditStatusChart" height="200"></canvas>
+        </div>
+        <div class="right">
+          <div class="pending-header">
+            <h2>Latest Documents</h2>
+            <a href="documents.html" class="view-all">View All</a>
+          </div>
+          <ul id="latestDocsList" class="task-list"></ul>
+        </div>
+      </div>
+
+      <section class="table">
+        <h2>Recent Incident Reports</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Incident Type</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>Severity</th>
+            </tr>
+          </thead>
+          <tbody id="recentIncidentsTbody"></tbody>
+        </table>
+      </section>
+    </section>
+  </div>
+
+  <script>
+    function formatDate(dateString) {
+      if (!dateString) return '—';
+      const d = new Date(dateString);
+      if (isNaN(d)) return dateString;
+      return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    async function loadMetrics() {
+      try {
+        // Audits metrics
+        const auditsRes = await fetch('/audits');
+        const audits = await auditsRes.json();
+        const today = new Date();
+        const currentYear = today.getFullYear();
+
+        const totalAuditsThisYear = audits.filter(a => a.audit_date && new Date(a.audit_date).getFullYear() === currentYear).length;
+        let upcomingAudits = 0;
+        audits.forEach(a => {
+          const status = (a.status || '').toLowerCase().trim();
+          if (a.audit_date && new Date(a.audit_date) > today) upcomingAudits++;
+          if (status === 'in progress') upcomingAudits++;
+        });
+
+        document.getElementById('totalAuditsMetric').textContent = totalAuditsThisYear;
+        document.getElementById('upcomingAuditsMetric').textContent = upcomingAudits;
+
+        // Incidents metrics
+        const incRes = await fetch('/api/incidents');
+        const incidents = await incRes.json();
+        const openIncidents = incidents.filter(i => (i.status || '').toLowerCase() === 'open').length;
+        document.getElementById('openIncidentsMetric').textContent = openIncidents;
+
+        // Documents metrics
+        const docsRes = await fetch('/documents');
+        const documents = await docsRes.json();
+        const pendingDocs = documents.filter(d => (d.approval_status || '').toLowerCase() === 'pending').length;
+        document.getElementById('pendingDocsMetric').textContent = pendingDocs;
+      } catch (err) {
+        console.error('Error loading metrics:', err);
+      }
+    }
+
+    async function loadAuditChart() {
+      try {
+        const res = await fetch('/audit-status-summary');
+        const data = await res.json();
+
+        const statusCounts = {};
+        data.forEach(({ status, count }) => {
+          const k = (status || '').toLowerCase().trim();
+          statusCounts[k] = (statusCounts[k] || 0) + parseInt(count);
+        });
+
+        const labels = Object.keys(statusCounts).map(s => s.charAt(0).toUpperCase() + s.slice(1));
+        const counts = Object.values(statusCounts);
+        const colorMap = {
+          'completed': '#33cc33',
+          'scheduled': '#fdd835',
+          'in progress': '#253f49ff',
+          'pending': '#F44336'
+        };
+        const backgroundColor = Object.keys(statusCounts).map(s => colorMap[s] || '#ccc');
+
+        const ctx = document.getElementById('auditStatusChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'pie',
+          data: {
+            labels,
+            datasets: [{ data: counts, backgroundColor }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { position: 'top' } }
+          }
+        });
+      } catch (err) {
+        console.error('Error loading chart:', err);
+      }
+    }
+
+    function docStatusToColor(statusRaw) {
+      const s = (statusRaw || '').toLowerCase();
+      if (s === 'approved') return 'green';
+      if (s === 'pending') return 'yellow';
+      return 'blue';
+    }
+
+    async function loadLatestDocuments() {
+      try {
+        const res = await fetch('/documents');
+        const documents = await res.json();
+        const list = document.getElementById('latestDocsList');
+        list.innerHTML = '';
+
+        documents.slice(0, 5).forEach(doc => {
+          const color = docStatusToColor(doc.approval_status);
+          const li = document.createElement('li');
+          li.className = `task-item ${color}`;
+          li.innerHTML = `
+            <span class="color-bar"></span>
+            <div class="task-details">
+              <strong>${doc.document_name}</strong>
+              <p>Status: ${doc.approval_status} • Last Validated: ${formatDate(doc.last_review)}</p>
+            </div>
+            <span class="menu-icon">⋮</span>
+          `;
+          list.appendChild(li);
+        });
+      } catch (err) {
+        console.error('Error loading latest documents:', err);
+      }
+    }
+
+    async function loadRecentIncidents() {
+      try {
+        const res = await fetch('/api/incidents');
+        const data = await res.json();
+        const tbody = document.getElementById('recentIncidentsTbody');
+        tbody.innerHTML = '';
+
+        data
+          .sort((a, b) => new Date(b.date_reported || 0) - new Date(a.date_reported || 0))
+          .slice(0, 5)
+          .forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${row.incident_type || '—'}</td>
+              <td>${row.date_reported || '—'}</td>
+              <td>${row.status || '—'}</td>
+              <td>${row.severity_level || '—'}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+      } catch (err) {
+        console.error('Error loading incidents:', err);
+      }
+    }
+
+    (async function init() {
+      await Promise.all([
+        loadMetrics(),
+        loadAuditChart(),
+        loadLatestDocuments(),
+        loadRecentIncidents()
+      ]);
+    })();
+  </script>
+</body>
+</html>

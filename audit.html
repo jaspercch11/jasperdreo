@@ -176,9 +176,50 @@
         </tbody>
       </table>
     </div>
-  </div>
-
-  <!-- Floating Form -->
+    </div>
+ 
+   <!-- Filter Modal -->
+   <div id="auditFilterModal" class="modal" style="display: none;">
+     <div class="modal-content styled-form">
+       <div class="modal-header">
+         <h3>🔍 Filter Audits</h3>
+         <button class="close-btn" type="button" onclick="closeAuditFilterModal()">✕</button>
+       </div>
+       <form id="auditFilterForm">
+         <label>
+           <span>Department</span>
+                       <select id="auditFilterDept" name="dept">
+              <option value="">Any</option>
+              <option>Human Resources</option>
+              <option>Project Management</option>
+              <option>Sales & CRM</option>
+              <option>Manufacturing & Production Mgmt.</option>
+              <option>Inventory & Warehouse Mgmt.</option>
+              <option>Procurement</option>
+              <option>Finance and Accounting</option>
+              <option>B.I. and Analytics</option>
+              <option>Compliance & Risk Mangement</option>
+            </select>
+         </label>
+         <label>
+           <span>Status</span>
+           <select id="auditFilterStatus" name="status">
+             <option value="">Any</option>
+             <option>Completed</option>
+             <option>Scheduled</option>
+             <option>Pending</option>
+             <option>In Progress</option>
+           </select>
+         </label>
+         <div class="modal-buttons">
+           <button type="button" class="cancel-btn" onclick="resetAuditFilters()">Reset</button>
+           <button type="submit" class="upload-btn">Apply Filters</button>
+         </div>
+       </form>
+     </div>
+   </div>
+ 
+   <!-- Floating Form -->
   <div class="floating-tab hidden" id="floatingTab">
   <div class="floating-header">
     <h3>➕ Report a New Audit</h3>
@@ -195,10 +236,15 @@
     <label for="department">Department</label>
     <select id="department" name="department" required>
       <option value="">Select Department</option>
-      <option value="CS">CS</option>
-      <option value="IT">IT</option>
-      <option value="HR">Human Resources</option>
-      <!-- Add more departments as needed -->
+      <option>Human Resources</option>
+      <option>Project Management</option>
+      <option>Sales & CRM</option>
+      <option>Manufacturing & Production Mgmt.</option>
+      <option>Inventory & Warehouse Mgmt.</option>
+      <option>Procurement</option>
+      <option>Finance and Accounting</option>
+      <option>B.I. and Analytics</option>
+      <option>Compliance & Risk Mangement</option>
     </select>
 
     <label for="auditor">Auditor</label>

@@ -294,3 +294,51 @@
         width: 100% !important;
         height: 100% !important;
     }
+
+/* Modal styles for audit filter */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(17, 24, 39, 0.45);
+  z-index: 999;
+  padding: 20px;
+}
+
+.modal .modal-content {
+  width: 480px;
+  max-width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  border: 1px solid #eee;
+  animation: modal-fade-in 200ms ease-out;
+}
+
+@keyframes modal-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.modal-header h3 { margin: 0; font-size: 18px; font-weight: 700; color: #111; }
+.close-btn { border: none; background: transparent; font-size: 20px; cursor: pointer; color: #555; padding: 4px 8px; border-radius: 6px; }
+.close-btn:hover { background: #f3f4f6; }
+
+.styled-form label { display: block; font-weight: 600; margin-top: 12px; color: #111; }
+.styled-form label span { display: inline-block; margin-bottom: 6px; color: #374151; }
+.styled-form select { width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: #fff; font-size: 14px; outline: none; transition: border-color 120ms ease, box-shadow 120ms ease; margin-top: 6px; }
+.styled-form select:focus { border-color: #6a93ff; box-shadow: 0 0 0 3px rgba(106,147,255,.25); }
+
+.modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+.upload-btn { background: linear-gradient(135deg, #c471f5, #6a93ff); color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; }
+.cancel-btn { background: #e5e7eb; color: #111; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }

@@ -65,12 +65,54 @@
         <tbody></tbody>
       </table>
     </section>
-  </main>
-
+    </main>
+ 
+  <!-- Filter Modal -->
+  <div id="filterModal" class="modal" style="display: none;">
+    <div class="modal-content styled-form">
+      <div class="modal-header">
+        <h3>🔍 Filter Documents</h3>
+        <button class="close-btn" type="button" onclick="closeFilterModal()">✕</button>
+      </div>
+      <form id="filterForm">
+        <label>
+          <span>Status</span>
+          <select name="status">
+            <option value="">Any</option>
+            <option value="Approved">Approved</option>
+            <option value="Pending">Pending</option>
+          </select>
+        </label>
+        <label>
+          <span>Department</span>
+          <select name="owner_dept">
+            <option value="">Any</option>
+            <option>HR</option>
+            <option>Project Management</option>
+            <option>Sales & CRM</option>
+            <option>Manufacturing & Production Mgmt.</option>
+            <option>Inventory & Warehouse Mgmt.</option>
+            <option>Procurement</option>
+            <option>Finance and Accounting</option>
+            <option>Compliance & Risk Mgmt.</option>
+            <option>B.I. and Analytics</option>
+          </select>
+        </label>
+        <div class="modal-buttons">
+          <button type="button" class="cancel-btn" onclick="resetFilters()">Reset</button>
+          <button type="submit" class="upload-btn">Apply Filters</button>
+        </div>
+      </form>
+    </div>
+  </div>
+ 
   <!-- Upload Modal -->
   <div id="uploadModal" class="modal" style="display: none;">
     <div class="modal-content styled-form">
-      <h3>📁 Upload Document</h3>
+      <div class="modal-header">
+        <h3>📁 Upload Document</h3>
+        <button class="close-btn" type="button" onclick="closeModal()">✕</button>
+      </div>
       <form id="uploadForm" enctype="multipart/form-data">
         <input type="text" name="document_name" placeholder="Document title" required />
         <select name="owner_dept" required>
@@ -100,7 +142,10 @@
   <!-- View Modal -->
   <div id="viewModal" class="modal" style="display:none;">
     <div class="modal-content styled-form">
-      <h3>📄 Document Details</h3>
+      <div class="modal-header">
+        <h3>📄 Document Details</h3>
+        <button class="close-btn" type="button" onclick="closeViewModal()">✕</button>
+      </div>
       <p><strong>Document Name:</strong> <span id="viewDocName"></span></p>
       <p><strong>Department Owner:</strong> <span id="viewOwner"></span></p>
       <p><strong>Status:</strong> <span id="viewStatus"></span></p>
@@ -114,29 +159,16 @@
   </div>
 
   <script>
-    let currentViewedDocId = null;
-
-    async function loadDocuments() {
+        let currentViewedDocId = null;
+    let allDocuments = [];
+    let activeFilters = { status: '', owner_dept: '' };
+ 
+     async function loadDocuments() {
       try {
         const res = await fetch('/documents');
         const documents = await res.json();
-        const tbody = document.querySelector('tbody');
-        tbody.innerHTML = '';
-        documents.forEach(doc => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td class="document">${doc.document_name}</td>
-            <td>${doc.owner_dept}</td>
-            <td>${formatDate(doc.document_approved)}</td>
-            <td class="status">${doc.approval_status}</td>
-            <td>${formatDate(doc.last_review)}</td>
-            <td class="actions">
-              <a href="/download/${doc.document_id}">Download</a>
-              <a href="#" onclick="viewDetails(${doc.document_id})">View</a>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
+        allDocuments = documents;
+        renderDocuments();
       } catch (err) {
         console.error(err);
       }
@@ -166,7 +198,8 @@
         document.getElementById('viewStatus').textContent = data.approval_status;
         document.getElementById('viewApprovedDate').textContent = formatDate(data.document_approved);
         document.getElementById('viewLastValidated').textContent = formatDate(data.last_review);
-        loadDocuments();
+        await loadDocuments();
+        renderDocuments();
       } catch (err) {
         console.error(err);
       }
@@ -182,6 +215,7 @@
       }
       document.getElementById('viewModal').style.display = 'none';
       await loadDocuments();
+      renderDocuments();
     }
 
     function closeModal() {
@@ -195,12 +229,97 @@
       return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
     }
 
+    function applyFilters(documents) {
+      return documents.filter(doc => {
+        const statusMatch = !activeFilters.status || doc.approval_status === activeFilters.status;
+        const deptMatch = !activeFilters.owner_dept || doc.owner_dept === activeFilters.owner_dept;
+        return statusMatch && deptMatch;
+      });
+    }
+
+    function renderDocuments() {
+      const tbody = document.querySelector('tbody');
+      tbody.innerHTML = '';
+      const filtered = applyFilters(allDocuments);
+      filtered.forEach(doc => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="document">${doc.document_name}</td>
+          <td>${doc.owner_dept}</td>
+          <td>${formatDate(doc.document_approved)}</td>
+          <td class="status">${doc.approval_status}</td>
+          <td>${formatDate(doc.last_review)}</td>
+          <td class="actions">
+            <a href="/download/${doc.document_id}">Download</a>
+            <a href="#" onclick="viewDetails(${doc.document_id})">View</a>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openFilterModal() {
+      const modal = document.getElementById('filterModal');
+      const form = document.getElementById('filterForm');
+      form.status.value = activeFilters.status;
+      form.owner_dept.value = activeFilters.owner_dept;
+      modal.style.display = 'flex';
+    }
+
+    function closeFilterModal() {
+      document.getElementById('filterModal').style.display = 'none';
+    }
+
+    function resetFilters() {
+      activeFilters = { status: '', owner_dept: '' };
+      const form = document.getElementById('filterForm');
+      form.reset();
+      renderDocuments();
+      closeFilterModal();
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       loadDocuments();
-      document.querySelector('.buttons .add').addEventListener('click', () => {
-        document.getElementById('uploadModal').style.display = 'flex';
+
+      const uploadModalEl = document.getElementById('uploadModal');
+      const viewModalEl = document.getElementById('viewModal');
+
+            document.querySelector('.buttons .add').addEventListener('click', () => {
+        uploadModalEl.style.display = 'flex';
       });
-      document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      document.querySelector('.buttons .filter').addEventListener('click', () => {
+        openFilterModal();
+      });
+ 
+      // Close when clicking outside the modal content
+      [uploadModalEl, viewModalEl, document.getElementById('filterModal')].forEach((modalEl) => {
+        modalEl.addEventListener('click', (e) => {
+          if (e.target === modalEl) {
+            if (modalEl === uploadModalEl) closeModal();
+            if (modalEl === viewModalEl) closeViewModal();
+          }
+        });
+      });
+
+      // Close on ESC key
+      document.addEventListener('keydown', (e) => {
+                  if (e.key === 'Escape') {
+            if (uploadModalEl.style.display === 'flex') closeModal();
+            if (viewModalEl.style.display === 'flex') closeViewModal();
+            if (document.getElementById('filterModal').style.display === 'flex') closeFilterModal();
+          }
+        });
+
+        document.getElementById('filterForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const form = e.target;
+          activeFilters.status = form.status.value;
+          activeFilters.owner_dept = form.owner_dept.value;
+          renderDocuments();
+          closeFilterModal();
+        });
+ 
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
         try {

@@ -14,7 +14,15 @@ const PORT = 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname));
+app.use(express.static(__dirname, { index: false }));
+
+// Serve HTML pages explicitly
+app.get(['/','/index.html'], (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/incident.html', (req, res) => res.sendFile(path.join(__dirname, 'incident.html')));
+app.get('/documents.html', (req, res) => res.sendFile(path.join(__dirname, 'documents.html')));
+app.get('/audit.html', (req, res) => res.sendFile(path.join(__dirname, 'audit.html')));
+app.get('/regulatory.html', (req, res) => res.sendFile(path.join(__dirname, 'regulatory.html')));
+app.get('/findings.html', (req, res) => res.sendFile(path.join(__dirname, 'findings.html')));
 
 // ===== DB Connection =====
 const pool = new Pool({
@@ -220,11 +228,18 @@ app.post("/audits", async (req, res) => {
 app.get("/api/incidents", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM incidents ORDER BY incident_id ASC");
+    const toDateStr = (value) => {
+      if (!value) return null;
+      try {
+        const d = value instanceof Date ? value : new Date(value);
+        return isNaN(d.getTime()) ? String(value) : d.toISOString().split("T")[0];
+      } catch {
+        return String(value);
+      }
+    };
     const formattedRows = result.rows.map((row) => ({
       ...row,
-      date_reported: row.date_reported
-        ? row.date_reported.toISOString().split("T")[0]
-        : null,
+      date_reported: toDateStr(row.date_reported),
     }));
     res.json(formattedRows);
   } catch (error) {
@@ -247,6 +262,39 @@ app.post("/submit-incident", upload.single("evidence"), async (req, res) => {
   } catch (error) {
     console.error("Insert incident error:", error);
     res.status(500).send("Database insert failed");
+  }
+});
+
+// Update incident status
+app.put('/api/incidents/:id/status', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!status) return res.status(400).json({ error: 'Missing status' });
+  try {
+    const result = await pool.query(
+      `UPDATE incidents SET status = $1 WHERE incident_id = $2 RETURNING *`,
+      [status, id]
+    );
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Incident not found' });
+    res.json({ success: true, incident: result.rows[0] });
+  } catch (error) {
+    console.error('Update incident status error:', error);
+    res.status(500).json({ error: 'Database update failed' });
+  }
+});
+
+// Download incident evidence
+app.get('/api/incidents/:id/evidence', async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT evidence FROM incidents WHERE incident_id = $1', [req.params.id]);
+    if (!rows.length || !rows[0].evidence) return res.status(404).send('Evidence not found');
+    const evidenceFile = rows[0].evidence;
+    const filePath = path.join(uploadDir, evidenceFile);
+    if (!fs.existsSync(filePath)) return res.status(404).send('File not found');
+    res.download(filePath, evidenceFile);
+  } catch (err) {
+    console.error('Evidence download error:', err);
+    res.status(500).send('Server error');
   }
 });
 

@@ -143,9 +143,34 @@
         </div>
       </form>
     </div>
-  </div>
-
-  <script>
+    </div>
+ 
+   <!-- Edit Status Modal -->
+   <div id="editStatusModal" class="modal" style="display: none;">
+     <div class="modal-content styled-form">
+       <div class="modal-header">
+         <h3>✏️ Update Incident Status</h3>
+         <button class="close-btn" type="button" onclick="closeEditModal()">✕</button>
+       </div>
+       <form id="editStatusForm">
+         <label>
+           <span>Status</span>
+           <select name="status">
+             <option value="Open">Open</option>
+             <option value="Investigating">Investigating</option>
+             <option value="In Progress">In Progress</option>
+             <option value="Resolved">Resolved</option>
+           </select>
+         </label>
+         <div class="modal-buttons">
+           <button type="button" class="cancel-btn" onclick="closeEditModal()">Cancel</button>
+           <button type="submit" class="upload-btn">Save</button>
+         </div>
+       </form>
+     </div>
+   </div>
+ 
+   <script>
     let allIncidents = [];
     let incidentFilters = { status: '', severity: '' };
 
@@ -179,14 +204,14 @@
       updateCards(filtered);
       filtered.forEach(row => {
         tbody.innerHTML += `
-          <tr>
+          <tr data-incident-id="${row.incident_id}">
             <td>${row.incident_type}</td>
             <td>${row.date_reported}</td>
             <td><span class="status-${row.status.toLowerCase()}">${row.status}</span></td>
             <td>${row.severity_level}</td>
             <td>
               <button class="action-btn view-btn">View</button>
-              <button class="action-btn edit-btn">Edit</button>
+              <button class="action-btn edit-btn" data-action="edit-status">Edit</button>
             </td>
           </tr>
         `;
@@ -241,6 +266,21 @@
       closeFilterModal();
     }
 
+    // Edit Status modal logic
+    let editingIncidentId = null;
+
+    function openEditModal(incidentId, currentStatus) {
+      editingIncidentId = incidentId;
+      const form = document.getElementById('editStatusForm');
+      form.status.value = currentStatus || 'Open';
+      document.getElementById('editStatusModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editStatusModal').style.display = 'none';
+      editingIncidentId = null;
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       loadIncidents();
 
@@ -254,7 +294,10 @@
       });
 
       document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && filterModal.style.display === 'flex') closeFilterModal();
+        if (e.key === 'Escape') {
+          if (filterModal.style.display === 'flex') closeFilterModal();
+          if (document.getElementById('editStatusModal').style.display === 'flex') closeEditModal();
+        }
       });
 
       document.getElementById('filterForm').addEventListener('submit', (e) => {
@@ -264,6 +307,39 @@
         incidentFilters.severity = form.severity.value;
         renderIncidents();
         closeFilterModal();
+      });
+
+      // Delegate clicks for Edit buttons
+      document.getElementById('incident-table-body').addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-action="edit-status"]');
+        if (!btn) return;
+        const tr = btn.closest('tr');
+        const id = tr && tr.getAttribute('data-incident-id');
+        const currentStatus = tr ? tr.querySelector('td:nth-child(3) span')?.textContent : 'Open';
+        if (id) openEditModal(id, currentStatus);
+      });
+
+      // Submit edit status form
+      document.getElementById('editStatusForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!editingIncidentId) return;
+        const form = e.target;
+        const newStatus = form.status.value;
+        try {
+          const res = await fetch(`/api/incidents/${editingIncidentId}/status`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus })
+          });
+          if (!res.ok) throw new Error('Failed to update');
+          // Refresh data and re-render
+          await loadIncidents();
+          renderIncidents();
+          closeEditModal();
+        } catch (err) {
+          console.error('Failed to update status:', err);
+          alert('Failed to update status');
+        }
       });
     });
   </script>

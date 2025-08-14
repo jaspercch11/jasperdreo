@@ -250,6 +250,24 @@ app.post("/submit-incident", upload.single("evidence"), async (req, res) => {
   }
 });
 
+// Update incident status
+app.put('/api/incidents/:id/status', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!status) return res.status(400).json({ error: 'Missing status' });
+  try {
+    const result = await pool.query(
+      `UPDATE incidents SET status = $1 WHERE incident_id = $2 RETURNING *`,
+      [status, id]
+    );
+    if (result.rowCount === 0) return res.status(404).json({ error: 'Incident not found' });
+    res.json({ success: true, incident: result.rows[0] });
+  } catch (error) {
+    console.error('Update incident status error:', error);
+    res.status(500).json({ error: 'Database update failed' });
+  }
+});
+
 // ===== START SERVER =====
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);

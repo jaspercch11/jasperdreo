@@ -233,6 +233,26 @@
       font-size: 14px;
     }
 
+    .status-open {
+      background-color: #60a5fa;
+      color: white;
+      border-radius: 12px;
+      padding: 4px 10px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .status-investigating,
+    .status-progress,
+    .status-in\ progress {
+      background-color: #eab308;
+      color: black;
+      border-radius: 12px;
+      padding: 4px 10px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
     .status-resolved {
       background-color: #4ade80;
       color: white;

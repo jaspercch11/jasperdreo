@@ -1,0 +1,176 @@
+* {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: white;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .container {
+      display: flex;
+      background-color: white;
+      width: 100%;
+      max-width: 1000px;
+      justify-content: space-between;
+      align-items: center;
+      gap: 40px;
+    }
+
+    .left-side {
+        display: flex;
+        flex-direction: column;
+        padding-left: 20px;
+        text-align: center;
+        margin-left:-15%;
+    }
+
+    .left-side h1 {
+      font-size: 50px;
+      font-weight: 700;
+      color: #333135;
+      margin-bottom: 10px;
+    }
+
+    .left-side p {
+      font-size: 1.2rem;
+      color: #333135;
+    }
+
+    .login-card {
+      max-width: 400px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      overflow: hidden;
+    }
+
+    .login-header {
+      background-color: #F3E4F9;
+      padding: 30px;
+      text-align: center;
+      border-top-left-radius: 15px;
+      border-top-right-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      
+    }
+
+    .top{
+      display: flex;
+      margin-left: 1em;
+    }
+
+    .p p{
+      color: #333135;
+      font-weight: 100;
+      opacity: 90%;
+    }
+
+    
+
+    .login-header h1{
+        color: #B87AF1;
+        font-size: 20px;
+        text-align: center;
+        margin-top: 6.8%;
+    }
+
+    .login-header img {
+      height: 60px;
+      margin-left: 15%;
+    }
+
+    .login-body {
+      padding: 30px;
+    }
+
+    .login-body label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: #222;
+    }
+
+    .login-body input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #666;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    .login-body input:focus{
+      outline-color: #3178fbb6
+    }
+
+    .login-body button {
+      width: 100%;
+      background-color: #3e7ef7;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .login-body .forgot {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .login-body .forgot a {
+      font-size: 0.8rem;
+      color: #3c7b57;
+      text-decoration: none;
+    }
+
+    .login-body .forgot a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .left-side {
+        padding: 0;
+      }
+
+      .login-card {
+        width: 100%;
+      }
+    }
+
+    #result {
+    font-size: 14px;
+    color: rgb(169, 16, 16);
+    padding: 10px;
+    border-radius: 5px;
+ 
+    }
+
+    @keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+/* Add shake animation on invalid input */
+.shake {
+  animation: shake 0.3s ease forwards;
+}

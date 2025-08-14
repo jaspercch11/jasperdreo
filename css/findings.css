@@ -1,0 +1,325 @@
+   @import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #c084fc, #818cf8);
+      color: #111;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100vh;
+      background: #FDFFFA;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 0;
+    }
+    .sidebar .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: 20px;
+      margin-bottom: 30px;
+    }
+    .sidebar .logo img {
+      width: 40px;
+      height: auto;
+    }
+    .sidebar .logo strong {
+      font-weight: 700;
+      font-size: 18px;
+      color: #004080;
+    }
+    .sidebar nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 40px 0;
+    }
+    .sidebar nav ul li {
+      padding: 14px 20px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+    }
+    .sidebar nav ul li a {
+      text-decoration: none;
+      color: #111;
+      flex-grow: 1;
+    }
+    .sidebar nav ul li:hover,
+    .sidebar nav ul li.active {
+      background: #E9D8F0;
+      font-weight: 600;
+    }
+
+    .sidebar .user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-left: 20px;
+      color: #222;
+    }
+    .sidebar .user span {
+      font-size: 24px;
+    }
+    .sidebar .user strong {
+      font-weight: 600;
+      font-size: 14px;
+      display: block;
+    }
+
+    /* Main content */
+    .main {
+      margin-left: 220px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+  /* Top Bar */
+  .topbar {
+    background: #F3E4F9;
+    height: 60px;
+    border-radius: 8px;
+    color: #111;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+  }
+  .topbar h1 {
+    font-weight: 700;
+    font-size: 18px;
+    color: black;
+    margin: 0;
+  }
+  .topbar .bell {
+    font-size: 24px;
+    cursor: pointer;
+    color: #111;
+  }
+
+  /* Card Container */
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px 30px 30px;
+    box-sizing: border-box;
+    max-width: 100%;
+    box-shadow: none;
+  }
+  .card h2 {
+    font-weight: 700;
+    font-size: 18px;
+    margin: 0 0 20px;
+    color: #111;
+  }
+
+  /* Filter + New Button Container */
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  button.filter-btn {
+    background: #D9D9D9;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-weight: 600;
+    color: #3D3D3D;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  button.filter-btn:hover {
+    background: #C4C4C4;
+  }
+  button.new-btn {
+    background: #1E5ADC;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 16px;
+    font-weight: 600;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  button.new-btn:hover {
+    background: #184bb8;
+  }
+
+  /* Table Styles */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #111;
+  }
+  thead tr {
+    background: #F3E4F9; 
+    color: #111;
+  }
+  thead th {
+    padding: 14px 12px;
+    font-weight: 700;
+    font-size: 14px;
+    text-align: left;
+    border-right: 1px solid #111;
+    user-select: none;
+  }
+  thead th:last-child {
+    border-right: none;
+  }
+  tbody tr {
+    border-bottom: 1px solid #111;
+  }
+  tbody td {
+    padding: 12px 12px;
+    vertical-align: middle;
+    font-size: 13px;
+    font-weight: 600;
+    border-right: 1px solid #111;
+  }
+  tbody td:last-child {
+    border-right: none;
+  }
+
+  /* Risk Name column */
+  tbody td.risk-name {
+    max-width: 120px;
+    word-break: break-word;
+  }
+
+  /* Assigned to: user icon */
+  .user-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 12px;
+  }
+  /* Different user icon colors */
+  .user-icon.red { background: #c68b8b; }
+  .user-icon.green { background: #617a60; }
+  .user-icon.purple { background: #6e36e4; }
+  .user-icon.cyan { background: #2cd3dc; }
+  .user-icon.yellow { background: #cdc933; }
+  .user-icon.brown { background: #7b4a4a; }
+
+  /* Due Date */
+  .due-date {
+    white-space: nowrap;
+    color: #5b2a15;
+    font-weight: 600;
+  }
+  /* Vertical separator */
+  .separator {
+    display: inline-block;
+    width: 2px;
+    background: #aaa;
+    height: 28px;
+    margin: 0 15px;
+    vertical-align: middle;
+  }
+
+  /* Progress bar container */
+  .progress-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .progress-bar-inner {
+    width: 120px;
+    height: 22px;
+    background: #D9D9D9;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 12px 0 0 12px;
+  }
+  /* Fill colors */
+  .fill-green {
+    background: #61ff35;
+  }
+  .fill-red {
+    background: #f34e4e;
+  }
+  .fill-purple {
+    background: #6d4a8b;
+  }
+
+  /* Percent text */
+  .percent {
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  /* Status badge */
+  .status-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+    color: white;
+    min-width: 75px;
+    text-align: center;
+  }
+  .status-ontrack {
+    background: #61ff35;
+    color: #1f4f04;
+  }
+  .status-atrisk {
+    background: #e12727;
+    color: #fff;
+  }
+  .status-ahead {
+    color: #694390;
+    background: transparent;
+    padding: 6px 6px;
+    min-width: auto;
+  }
+
+  /* Edit button */
+  .btn-edit {
+    background: #c6b989;
+    border: none;
+    border-radius: 10px;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #3f2e00;
+    font-size: 13px;
+    user-select: none;
+  }
+  .btn-edit:hover {
+    background: #a99954;
+    color: #fff;
+  }
+
+  /* Table row vertical alignment */
+  tbody td {
+    vertical-align: middle;
+  }

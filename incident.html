@@ -109,35 +109,133 @@
     </div>
   </div>
 
+  <!-- Filter Modal -->
+  <div id="filterModal" class="modal" style="display: none;">
+    <div class="modal-content styled-form">
+      <div class="modal-header">
+        <h3>🔍 Filter Incidents</h3>
+        <button class="close-btn" type="button" onclick="closeFilterModal()">✕</button>
+      </div>
+      <form id="filterForm">
+        <label>
+          <span>Status</span>
+          <select name="status">
+            <option value="">Any</option>
+            <option value="Open">Open</option>
+            <option value="Investigating">Investigating</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </label>
+        <label>
+          <span>Severity</span>
+          <select name="severity">
+            <option value="">Any</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Critical">Critical</option>
+          </select>
+        </label>
+        <div class="modal-buttons">
+          <button type="button" class="cancel-btn" onclick="resetIncidentFilters()">Reset</button>
+          <button type="submit" class="upload-btn">Apply Filters</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
+    let allIncidents = [];
+    let incidentFilters = { status: '', severity: '' };
+
     async function loadIncidents() {
       try {
         const res = await fetch("/api/incidents");
         const data = await res.json();
-
-        const tbody = document.getElementById("incident-table-body");
-        tbody.innerHTML = "";
-
-        data.forEach(row => {
-          tbody.innerHTML += `
-            <tr>
-              <td>${row.incident_type}</td>
-              <td>${row.date_reported}</td>
-              <td><span class="status-${row.status.toLowerCase()}">${row.status}</span></td>
-              <td>${row.severity_level}</td>
-              <td>
-                <button class="action-btn view-btn">View</button>
-                <button class="action-btn edit-btn">Edit</button>
-              </td>
-            </tr>
-          `;
-        });
+        allIncidents = data;
+        renderIncidents();
       } catch (err) {
         console.error("Error loading incidents:", err);
       }
     }
 
-    loadIncidents();
+    function applyIncidentFilters(rows) {
+      return rows.filter(r => {
+        const rStatus = (r.status || '').toLowerCase();
+        const rSeverity = (r.severity_level || '').toLowerCase();
+        const fStatus = (incidentFilters.status || '').toLowerCase();
+        const fSeverity = (incidentFilters.severity || '').toLowerCase();
+        const statusOk = !fStatus || rStatus === fStatus;
+        const severityOk = !fSeverity || rSeverity === fSeverity;
+        return statusOk && severityOk;
+      });
+    }
+
+    function renderIncidents() {
+      const tbody = document.getElementById("incident-table-body");
+      tbody.innerHTML = "";
+      const filtered = applyIncidentFilters(allIncidents);
+      filtered.forEach(row => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${row.incident_type}</td>
+            <td>${row.date_reported}</td>
+            <td><span class="status-${row.status.toLowerCase()}">${row.status}</span></td>
+            <td>${row.severity_level}</td>
+            <td>
+              <button class="action-btn view-btn">View</button>
+              <button class="action-btn edit-btn">Edit</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    function openFilterModal() {
+      const form = document.getElementById('filterForm');
+      form.status.value = incidentFilters.status;
+      form.severity.value = incidentFilters.severity;
+      document.getElementById('filterModal').style.display = 'flex';
+    }
+
+    function closeFilterModal() {
+      document.getElementById('filterModal').style.display = 'none';
+    }
+
+    function resetIncidentFilters() {
+      incidentFilters = { status: '', severity: '' };
+      const form = document.getElementById('filterForm');
+      form.reset();
+      renderIncidents();
+      closeFilterModal();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadIncidents();
+
+      document.querySelector('.btn-filter').addEventListener('click', () => {
+        openFilterModal();
+      });
+
+      const filterModal = document.getElementById('filterModal');
+      filterModal.addEventListener('click', (e) => {
+        if (e.target === filterModal) closeFilterModal();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && filterModal.style.display === 'flex') closeFilterModal();
+      });
+
+      document.getElementById('filterForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const form = e.target;
+        incidentFilters.status = form.status.value;
+        incidentFilters.severity = form.severity.value;
+        renderIncidents();
+        closeFilterModal();
+      });
+    });
   </script>
 
 </body>

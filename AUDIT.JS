@@ -1,13 +1,49 @@
 /* ============================================
    >>> LOAD AUDITS AND UPDATE DASHBOARD <<<
    ============================================ */
+  let allAudits = [];
+  let auditFilters = { dept: '', status: '' };
+
+  function renderAudits() {
+    const tbody = document.querySelector("tbody");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    const normalized = allAudits.map(a => ({
+      ...a,
+      status_norm: (a.status || '').toLowerCase().trim(),
+    }));
+
+    const filtered = normalized.filter(a => {
+      const deptOk = !auditFilters.dept || a.dept_audited === auditFilters.dept;
+      const statusOk = !auditFilters.status || a.status_norm === auditFilters.status.toLowerCase();
+      return deptOk && statusOk;
+    });
+
+    filtered.forEach(audit => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+          <td>${audit.audit_name || "N/A"}</td>
+          <td>${audit.dept_audited || "N/A"}</td>
+          <td>${audit.auditor || "N/A"}</td>
+          <td>${audit.audit_date ? new Date(audit.audit_date).toLocaleDateString() : "N/A"}</td>
+          <td><span class="badge ${getStatusColor(audit.status_norm)}">${formatStatus(audit.status_norm)}</span></td>
+          <td class="table-actions">
+            <button class="btn view">View</button>
+            <button class="btn edit">Edit</button>
+          </td>
+        `;
+      tbody.appendChild(row);
+    });
+  }
+
   async function loadAudits() {
     try {
       const res = await fetch("http://localhost:3000/audits");
       const audits = await res.json();
 
-      const tbody = document.querySelector("tbody");
-      tbody.innerHTML = "";
+      allAudits = audits;
+      renderAudits();
 
       const today = new Date();
       const currentYear = today.getFullYear();
@@ -25,21 +61,6 @@
 
       audits.forEach(audit => {
         const status = (audit.status || "").toLowerCase().trim();
-
-        // Build Table Row
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${audit.audit_name || "N/A"}</td>
-          <td>${audit.dept_audited || "N/A"}</td>
-          <td>${audit.auditor || "N/A"}</td>
-          <td>${audit.audit_date ? new Date(audit.audit_date).toLocaleDateString() : "N/A"}</td>
-          <td><span class="badge ${getStatusColor(status)}">${formatStatus(status)}</span></td>
-          <td class="table-actions">
-            <button class="btn view">View</button>
-            <button class="btn edit">Edit</button>
-          </td>
-        `;
-        tbody.appendChild(row);
 
         // Metrics Calculation
         if (audit.audit_date && new Date(audit.audit_date) > today) {
@@ -62,11 +83,23 @@
       document.getElementById("openFindings").textContent = openFindings;
       document.getElementById("highRiskIssues").textContent = highRiskIssues;
 
+      // Populate filter department options
+      const deptSelect = document.getElementById('auditFilterDept');
+      if (deptSelect) {
+        const depts = Array.from(new Set(audits.map(a => a.dept_audited).filter(Boolean)));
+        depts.sort((a,b) => a.localeCompare(b));
+        depts.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d;
+          opt.textContent = d;
+          deptSelect.appendChild(opt);
+        });
+      }
+
     } catch (err) {
       console.error("Error fetching audits:", err);
     }
   }
-
 
 /* ============================================
    >>> STATUS COLOR AND LABEL FORMATTERS <<<
@@ -179,6 +212,39 @@ document.getElementById('auditForm').addEventListener('submit', async function(e
     alert('⚠️ Error submitting audit: ' + err.message);
   }
 });
+
+/* ============================================
+   >>> FILTER MODAL WIRING <<<
+   ============================================ */
+window.addEventListener('DOMContentLoaded', () => {
+  const filterBtn = document.querySelector('.btn.btn-filter');
+  const modal = document.getElementById('auditFilterModal');
+  const form = document.getElementById('auditFilterForm');
+  if (!filterBtn || !modal || !form) return;
+
+  filterBtn.addEventListener('click', () => {
+    // Keep current filter selections in the form
+    document.getElementById('auditFilterDept').value = auditFilters.dept;
+    document.getElementById('auditFilterStatus').value = auditFilters.status;
+    modal.style.display = 'flex';
+  });
+
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeAuditFilterModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.style.display === 'flex') closeAuditFilterModal(); });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    auditFilters.dept = document.getElementById('auditFilterDept').value;
+    auditFilters.status = document.getElementById('auditFilterStatus').value.toLowerCase();
+    renderAudits();
+    closeAuditFilterModal();
+  });
+});
+
+function closeAuditFilterModal() {
+  const modal = document.getElementById('auditFilterModal');
+  if (modal) modal.style.display = 'none';
+}
 
 /* ============================================
    >>> INITIAL LOAD ON PAGE READY <<<

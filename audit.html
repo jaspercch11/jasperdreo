@@ -176,9 +176,41 @@
         </tbody>
       </table>
     </div>
-  </div>
-
-  <!-- Floating Form -->
+    </div>
+ 
+   <!-- Filter Modal -->
+   <div id="auditFilterModal" class="modal" style="display: none;">
+     <div class="modal-content styled-form">
+       <div class="modal-header">
+         <h3>🔍 Filter Audits</h3>
+         <button class="close-btn" type="button" onclick="closeAuditFilterModal()">✕</button>
+       </div>
+       <form id="auditFilterForm">
+         <label>
+           <span>Department</span>
+           <select id="auditFilterDept" name="dept">
+             <option value="">Any</option>
+           </select>
+         </label>
+         <label>
+           <span>Status</span>
+           <select id="auditFilterStatus" name="status">
+             <option value="">Any</option>
+             <option>Completed</option>
+             <option>Scheduled</option>
+             <option>Pending</option>
+             <option>In Progress</option>
+           </select>
+         </label>
+         <div class="modal-buttons">
+           <button type="button" class="cancel-btn" onclick="resetAuditFilters()">Reset</button>
+           <button type="submit" class="upload-btn">Apply Filters</button>
+         </div>
+       </form>
+     </div>
+   </div>
+ 
+   <!-- Floating Form -->
   <div class="floating-tab hidden" id="floatingTab">
   <div class="floating-header">
     <h3>➕ Report a New Audit</h3>

@@ -244,7 +244,7 @@
 
     .status-investigating,
     .status-progress,
-    .status-in\ progress {
+    .status-in-progress {
       background-color: #eab308;
       color: black;
       border-radius: 12px;

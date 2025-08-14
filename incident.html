@@ -224,7 +224,7 @@
           <tr data-incident-id="${row.incident_id}">
             <td>${row.incident_type}</td>
             <td>${row.date_reported}</td>
-            <td><span class="status-${row.status.toLowerCase()}">${row.status}</span></td>
+            <td><span class="status-${(row.status || '').toLowerCase().replace(/\s+/g, '-')}">${row.status || '—'}</span></td>
             <td>${row.severity_level}</td>
             <td>
               <button class="action-btn view-btn">View</button>

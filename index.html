@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Page</title>
+  <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+
+  <!-- ========================================
+       >>> MAIN CONTAINER <<<
+       ======================================== -->
+  <div class="container">
+
+    <!-- ========== LEFT SIDE MESSAGE ========== -->
+    <div class="left-side">
+      <h1>Welcome Back!</h1>
+      <p>Please login to your account</p>
+    </div>
+
+    <!-- ========== LOGIN CARD SECTION ========== -->
+    <div class="login-card">
+
+      <!-- ----- LOGIN HEADER (Logo + Title) ----- -->
+      <div class="login-header">
+        <div class="top">
+          <img src="img/logo.png" alt="Logo" />
+          <h1>SkinBloom</h1>
+        </div>
+        <div class="p">
+          <p>Compliance and Risk System</p>
+        </div>
+      </div>
+
+      <!-- ----- LOGIN FORM BODY ----- -->
+      <div class="login-body">
+        <form id="loginForm">
+          <label for="username">Username</label>
+          <input type="text" id="username" required>
+
+          <label for="password">Password</label>
+          <input type="password" id="password" required>
+
+          <button type="submit">Login</button>
+        </form>
+
+        <p class="forgot"><a href="#">Forgot password?</a></p>
+        <p id="result"></p>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================
+       >>> LOGIN LOGIC SCRIPT <<<
+       ======================================== -->
+  <script>
+    const form = document.getElementById('loginForm');
+    const result = document.getElementById('result');
+    const name = 'admin';
+    const pass = 'admin123';
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const usernameInput = document.getElementById('username');
+      const passwordInput = document.getElementById('password');
+
+      const username = usernameInput.value;
+      const password = passwordInput.value;
+
+      // Reset styles before validating
+      usernameInput.style.border = '1px solid #ccc';
+      passwordInput.style.border = '1px solid #ccc';
+
+      // ==== LOGIN SUCCESS ====
+      if (username === name && password === pass) {
+        result.textContent = "Login Successfully";
+        result.style.color = 'green';
+        result.style.display = "block";
+
+        setTimeout(() => {
+          window.location.href = 'loading.html'; // 👈 redirect on success
+        }, 1000);
+      } 
+      // ==== LOGIN FAILURE ====
+      else {
+        result.textContent = "Invalid credentials";
+        result.style.color = 'red';
+        result.style.display = "block";
+
+        // Animate and highlight incorrect fields
+        usernameInput.classList.add('shake');
+        passwordInput.classList.add('shake');
+
+        // Add red border on failure
+        usernameInput.style.border = '1px solid red';
+        passwordInput.style.border = '1px solid red';
+
+        // Optional redirect (you can remove this if not needed)
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 600);
+      }
+    });
+  </script>
+
+</body>
+</html>

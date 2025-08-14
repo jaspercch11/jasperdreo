@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ComplyTeam Dashboard</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,600,700">
+  <link rel="stylesheet" href="css/audit.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Floating Tab Styles */
+    .floating-tab {
+      position: fixed;
+      top: 10%;
+      right: 5%;
+      width: 350px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      transition: all 0.3s ease;
+      border: 2px solid #ccc;
+    }
+
+    .floating-tab h3 {
+      margin-top: 0;
+      color: #333;
+    }
+
+    .floating-tab form label {
+      display: block;
+      margin-top: 12px;
+      font-weight: 600;
+    }
+
+    .floating-tab form input,
+    .floating-tab form select,
+    .floating-tab form textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #aaa;
+    }
+
+    .floating-tab form button[type="submit"] {
+      margin-top: 15px;
+      width: 100%;
+      background: linear-gradient(to right, #b87af1, #5ca0f2);
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .floating-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div>
+      <div class="logo">
+        <img src="img/LOGO.png" alt="Logo" />
+        <strong>SkinBloom</strong>
+      </div>
+      <nav>
+        <ul>
+          <li><span>🏠</span> <a href="regulatory.html">Dashboard</a></li>
+          <li class="active"><span>🔍</span> <a href="audit.html">Audits</a></li>
+          <li><span>⚠️</span> <a href="findings.html">Findings</a></li>
+          <li><span>📁</span> <a href="documents.html">Documents</a></li>
+          <li><span>🚩</span> <a href="incident.html">Incidents</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="user">
+      <span>👤</span>
+      <div>
+        <strong>Jasper John Dreo</strong>
+        <small>Compliance</small>
+      </div>
+    </div>
+  </div>
+  <div class="main">
+    <header>
+      <div>Incident Tracking</div>
+      <svg class="bell-icon" viewBox="0 0 24 24">
+        <path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 1 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+      </svg>
+    </header>
+
+    <div class="metrics">
+      <div class="metric-box blue">
+        <div>Total Audits of<br/>This Year<br/><strong id="totalAudits">0</strong></div>
+        <div class="metric-icon">📅</div>
+      </div>
+      <div class="metric-box green">
+        <div>Upcoming<br/>Audits<br/><strong id="upcomingAudits">0</strong></div>
+        <div class="metric-icon">📋</div>
+      </div>
+      <div class="metric-box yellow">
+        <div>Open<br/>Findings<br/><strong id="openFindings">0</strong></div>
+        <div class="metric-icon">🛠️</div>
+      </div>
+      <div class="metric-box red">
+        <div>High-risk<br/>Issues<br/><strong id="highRiskIssues">0</strong></div>
+        <div class="metric-icon">❗</div>
+      </div>
+    </div>
+
+    <div class="audit-panels">
+      <div class="audit-status">
+        <h3>Audit Status Summary</h3>
+        <div class="chart-container">
+          <canvas id="auditStatusChart"></canvas>
+        </div>
+      </div>
+      <div class="recent-activity">
+        <h3>Recent Activity</h3>
+        <div class="activity-item">
+          <time>Jul 31, 2025<br>10:45 AM</time>
+          <p>Jake Cyrus submitted audit report for Logistics</p>
+        </div>
+        <div class="activity-item">
+          <time>Jul 30, 2025<br>04:32 PM</time>
+          <p>New Audit scheduled for Warehouse</p>
+        </div>
+        <div class="activity-item">
+          <time>Jul 30, 2025<br>03:20 PM</time>
+          <p>Marked corrective action CA_015 as "Completed"</p>
+        </div>
+        <div class="activity-item">
+          <time>Jul 30, 2025<br>03:20 PM</time>
+          <p>Rescheduled audit for Production to Aug 10, 2025</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-section">
+      <div class="table-controls">
+        <button class="btn btn-new" onclick="openFloatingTab()">+ New</button>
+        <button class="btn btn-filter">🔍 Filter</button>
+      </div>
+      <h3>Internal Audits</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Auditor</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- JS will inject rows here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Floating Form -->
+  <div class="floating-tab hidden" id="floatingTab">
+  <div class="floating-header">
+    <h3>➕ Report a New Audit</h3>
+    <button class="close-btn" onclick="closeFloatingTab()">❌</button>
+  </div>
+  
+  <form id="auditForm">
+    <label>Audit ID</label>
+    <input type="text" name="auditId" required />
+
+    <label for="auditName">Name</label>
+    <input type="text" id="auditName" name="auditName" placeholder="Enter audit name" required />
+
+    <label for="department">Department</label>
+    <select id="department" name="department" required>
+      <option value="">Select Department</option>
+      <option value="CS">CS</option>
+      <option value="IT">IT</option>
+      <option value="HR">Human Resources</option>
+      <!-- Add more departments as needed -->
+    </select>
+
+    <label for="auditor">Auditor</label>
+    <input type="text" id="auditor" name="auditor" placeholder="Enter auditor's name" required />
+
+    <label for="auditDate">Date</label>
+    <input type="date" id="auditDate" name="auditDate" required />
+
+    <label for="status">Status</label>
+    <select id="status" name="status" required>
+      <option value="">Select Status</option>
+      <option value="Completed">Completed</option>
+      <option value="Scheduled">Scheduled</option>
+      <option value="Pending">Pending</option>
+      <option value="In Progress">In Progress</option>
+    </select>
+
+    <button type="submit">Submit</button>
+  </form>
+</div>
+
+  <script src="AUDIT.JS"></script>
+  <script>
+    function openFloatingTab() {
+      document.getElementById("floatingTab").classList.remove("hidden");
+    }
+
+    function closeFloatingTab() {
+      document.getElementById("floatingTab").classList.add("hidden");
+    }
+  </script>
+  
+</body>
+</html>

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Assessment Heat Map</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .heatmap-cell {
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .heatmap-cell:hover {
+            transform: scale(1.05);
+            z-index: 10;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .heatmap-tooltip {
+            visibility: hidden;
+            width: 200px;
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 20;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .heatmap-cell:hover .heatmap-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .risk-item {
+            transition: transform 0.2s;
+        }
+        .risk-item:hover {
+            transform: translateY(-2px);
+        }
+        .color-legend span {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <div class="text-center mb-12">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Risk Assessment Heat Map</h1>
+            <p class="text-gray-600">Visualize and manage organizational risks by likelihood and impact</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Heat Map Section -->
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-700">Risk Heat Map</h2>
+                    <div class="flex items-center">
+                        <span class="text-sm text-gray-500 mr-2">Filter:</span>
+                        <select id="categoryFilter" class="border rounded px-3 py-1 text-sm">
+                            <option value="all">All Categories</option>
+                            <option value="Financial">Financial</option>
+                            <option value="Operational">Operational</option>
+                            <option value="Strategic">Strategic</option>
+                            <option value="Compliance">Compliance</option>
+                            <option value="Reputational">Reputational</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Heat Map Grid -->
+                <div class="overflow-x-auto">
+                    <div class="inline-block min-w-full">
+                        <!-- Likelihood Header -->
+                        <div class="grid grid-cols-6 gap-2 mb-2">
+                            <div class="text-right pr-2 flex items-center justify-end">
+                                <span class="text-sm font-medium text-gray-500">Impact</span>
+                            </div>
+                            <div class="text-center">
+                                <span class="text-xs font-medium text-gray-500">Very Low (1)</span>
+                            </div>
+                            <div class="text-center">
+                                <span class="text-xs font-medium text-gray-500">Low (2)</span>
+                            </div>
+                            <div class="text-center">
+                                <span class="text-xs font-medium text-gray-500">Medium (3)</span>
+                            </div>
+                            <div class="text-center">
+                                <span class="text-xs font-medium text-gray-500">High (4)</span>
+                            </div>
+                            <div class="text-center">
+                                <span class="text-xs font-medium text-gray-500">Very High (5)</span>
+                            </div>
+                        </div>
+
+                        <!-- Heat Map Rows -->
+                        <div id="heatmap" class="grid grid-cols-6 gap-2">
+                            <!-- Row 1 - Very High Impact -->
+                            <div class="text-right pr-2 flex items-center">
+                                <span class="text-sm font-medium text-gray-500">Very High (5)</span>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-200 border border-gray-200 rounded-lg relative" data-impact="5" data-likelihood="1">
+                                <div class="heatmap-tooltip">5x1 - Medium Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-yellowMost-200 border border-gray-200 rounded-lg relative" data-impact="5" data-likelihood="2">
+                                <div class="heatmap-tooltip">5x2 - Moderate Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-orangeMost-200 border border-gray-200 rounded-lg relative" data-impact="5" data-likelihood="3">
+                                <div class="heatmap-tooltip">5x3 - High Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-redMost-200 border border-gray-200 rounded-lg relative" data-impact="5" data-likelihood="4">
+                                <div class="heatmap-tooltip">5x4 - Very High Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-redMost-600 border border-gray-200 rounded-lg relative" data-impact="5" data-likelihood="5">
+                                <div class="heatmap-tooltip">5x5 - Critical Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+
+                            <!-- Row 2 - High Impact -->
+                            <div class="text-right pr-2 flex items-center">
+                                <span class="text-sm font-medium text-gray-500">High (4)</span>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-100 border border-gray-200 rounded-lg relative" data-impact="4" data-likelihood="1">
+                                <div class="heatmap-tooltip">4x1 - Low Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-200 border border-gray-200 rounded-lg relative" data-impact="4" data-likelihood="2">
+                                <div class="heatmap-tooltip">4x2 - Medium Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-yellowMost-300 border border-gray-200 rounded-lg relative" data-impact="4" data-likelihood="3">
+                                <div class="heatmap-tooltip">4x3 - Moderate Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-orangeMost-400 border border-gray-200 rounded-lg relative" data-impact="4" data-likelihood="4">
+                                <div class="heatmap-tooltip">4x4 - High Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-redMost-400 border border-gray-200 rounded-lg relative" data-impact="4" data-likelihood="5">
+                                <div class="heatmap-tooltip">4x5 - Very High Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+
+                            <!-- Row 3 - Medium Impact -->
+                            <div class="text-right pr-2 flex items-center">
+                                <span class="text-sm font-medium text-gray-500">Medium (3)</span>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-100 border border-gray-200 rounded-lg relative" data-impact="3" data-likelihood="1">
+                                <div class="heatmap-tooltip">3x1 - Low Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-100 border border-gray-200 rounded-lg relative" data-impact="3" data-likelihood="2">
+                                <div class="heatmap-tooltip">3x2 - Low Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-200 border border-gray-200 rounded-lg relative" data-impact="3" data-likelihood="3">
+                                <div class="heatmap-tooltip">3x3 - Medium Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-yellowMost-300 border border-gray-200 rounded-lg relative" data-impact="3" data-likelihood="4">
+                                <div class="heatmap-tooltip">3x4 - Moderate Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-orangeMost-400 border border-gray-200 rounded-lg relative" data-impact="3" data-likelihood="5">
+                                <div class="heatmap-tooltip">3x5 - High Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+
+                            <!-- Row 4 - Low Impact -->
+                            <div class="text-right pr-2 flex items-center">
+                                <span class="text-sm font-medium text-gray-500">Low (2)</span>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-50 border border-gray-200 rounded-lg relative" data-impact="2" data-likelihood="1">
+                                <div class="heatmap-tooltip">2x1 - Minimal Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-100 border border-gray-200 rounded-lg relative" data-impact="2" data-likelihood="2">
+                                <div class="heatmap-tooltip">2x2 - Low Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-100 border border-gray-200 rounded-lg relative" data-impact="2" data-likelihood="3">
+                                <div class="heatmap-tooltip">2x3 - Low Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-200 border border-gray-200 rounded-lg relative" data-impact="2" data-likelihood="4">
+                                <div class="heatmap-tooltip">2x4 - Medium Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-yellowMost-300 border border-gray-200 rounded-lg relative" data-impact="2" data-likelihood="5">
+                                <div class="heatmap-tooltip">2x5 - Moderate Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+
+                            <!-- Row 5 - Very Low Impact -->
+                            <div class="text-right pr-2 flex items-center">
+                                <span class="text-sm font-medium text-gray-500">Very Low (1)</span>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-50 border border-gray-200 rounded-lg relative" data-impact="1" data-likelihood="1">
+                                <div class="heatmap-tooltip">1x1 - Minimal Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-50 border border-gray-200 rounded-lg relative" data-impact="1" data-likelihood="2">
+                                <div class="heatmap-tooltip">1x2 - Minimal Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-100 border border-gray-200 rounded-lg relative" data-impact="1" data-likelihood="3">
+                                <div class="heatmap-tooltip">1x3 - Low Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-100 border border-gray-200 rounded-lg relative" data-impact="1" data-likelihood="4">
+                                <div class="heatmap-tooltip">1x4 - Low Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                            <div class="heatmap-cell bg-greenMost-200 border border-gray-200 rounded-lg relative" data-impact="1" data-likelihood="5">
+                                <div class="heatmap-tooltip">1x5 - Medium Risk</div>
+                                <div class="risk-container min-h-16 p-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 flex flex-wrap items-center justify-center color-legend">
+                    <div class="flex items-center mr-6 mb-2">
+                        <span class="bg-greenMost-100"></span>
+                        <span class="text-xs">Minimal/Low Risk</span>
+                    </div>
+                    <div class="flex items-center mr-6 mb-2">
+                        <span class="bg-greenMost-200"></span>
+                        <span class="text-xs">Medium Risk</span>
+                    </div>
+                    <div class="flex items-center mr-6 mb-2">
+                        <span class="bg-yellowMost-300"></span>
+                        <span class="text-xs">Moderate Risk</span>
+                    </div>
+                    <div class="flex items-center mr-6 mb-2">
+                        <span class="bg-orangeMost-400"></span>
+                        <span class="text-xs">High Risk</span>
+                    </div>
+                    <div class="flex items-center mb-2">
+                        <span class="bg-redMost-500"></span>
+                        <span class="text-xs">Critical Risk</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Risk Section -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-700 mb-6">Add New Risk</h2>
+                
+                <form id="riskForm" class="space-y-4">
+                    <div>
+                        <label for="riskName" class="block text-sm font-medium text-gray-700 mb-1">Risk Name</label>
+                        <input type="text" id="riskName" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm" required>
+                    </div>
+                    
+                    <div>
+                        <label for="riskCategory" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                        <select id="riskCategory" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm" required>
+                            <option value="">Select category</option>
+                            <option value="Financial">Financial</option>
+                            <option value="Operational">Operational</option>
+                            <option value="Strategic">Strategic</option>
+                            <option value="Compliance">Compliance</option>
+                            <option value="Reputational">Reputational</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Likelihood</label>
+                        <div class="grid grid-cols-5 gap-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="likelihood" value="1" class="mr-1" required>
+                                <span class="text-xs">Very Low</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="likelihood" value="2" class="mr-1">
+                                <span class="text-xs">Low</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="likelihood" value="3" class="mr-1">
+                                <span class="text-xs">Medium</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="likelihood" value="4" class="mr-1">
+                                <span class="text-xs">High</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="likelihood" value="5" class="mr-1">
+                                <span class="text-xs">Very High</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Impact</label>
+                        <div class="grid grid-cols-5 gap-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="impact" value="1" class="mr-1" required>
+                                <span class="text-xs">Very Low</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="impact" value="2" class="mr-1">
+                                <span class="text-xs">Low</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="impact" value="3" class="mr-1">
+                                <span class="text-xs">Medium</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="impact" value="4" class="mr-1">
+                                <span class="text-xs">High</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="impact" value="5" class="mr-1">
+                                <span class="text-xs">Very High</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="riskDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea id="riskDescription" rows="3" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"></textarea>
+                    </div>
+                    
+                    <div>
+                        <label for="riskMitigation" class="block text-sm font-medium text-gray-700 mb-1">Mitigation Strategy</label>
+                        <textarea id="riskMitigation" rows="2" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm"></textarea>
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        Add Risk
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Risk Details Modal -->
+        <div id="riskModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h3 id="modalRiskName" class="text-xl font-bold text-gray-800"></h3>
+                            <div id="modalRiskPosition" class="text-sm text-gray-500 mt-1"></div>
+                        </div>
+                        <button id="closeModal" class="text-gray-400 hover:text-gray-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Category</h4>
+                            <p id="modalRiskCategory" class="text-gray-700 mt-1"></p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Description</h4>
+                            <p id="modalRiskDescription" class="text-gray-700 mt-1"></p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-500">Mitigation Strategy</h4>
+                            <p id="modalRiskMitigation" class="text-gray-700 mt-1"></p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500">Likelihood</h4>
+                                <div id="modalRiskLikelihood" class="mt-1"></div>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-500">Impact</h4>
+                                <div id="modalRiskImpact" class="mt-1"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 flex space-x-3">
+                        <button id="deleteRisk" class="px-4 py-2 bg-red-100 text-red-700 text-sm font-medium rounded-md hover:bg-red-200">
+                            Delete Risk
+                        </button>
+                        <button id="editRisk" class="px-4 py-2 bg-blue-100 text-blue-700 text-sm font-medium rounded-md hover:bg-blue-200">
+                            Edit Risk
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tailwind custom colors for risk levels
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        greenMost: {
+                            '50': '#f0fdf4',
+                            '100': '#dcfce7',
+                            '200': '#bbf7d0',
+                        },
+                        yellowMost: {
+                            '200': '#fef08a',
+                            '300': '#fde047',
+                        },
+                        orangeMost: {
+                            '200': '#fed7aa',
+                            '400': '#fb923c',
+                        },
+                        redMost: {
+                            '200': '#fecaca',
+                            '400': '#f87171',
+                            '500': '#ef4444',
+                            '600': '#dc2626',
+                        }
+                    }
+                }
+            }
+        }
+
+        // Sample risks data
+        let risks = [
+            {
+                id: 1,
+                name: "Data Breach",
+                category: "Compliance",
+                likelihood: 3,
+                impact: 5,
+                description: "Potential exposure of sensitive customer data due to security vulnerabilities",
+                mitigation: "Implement multi-factor authentication and regular security audits"
+            },
+            {
+                id: 2,
+                name: "Supply Chain Disruption",
+                category: "Operational",
+                likelihood: 4,
+                impact: 4,
+                description: "Delays in receiving critical components from overseas suppliers",
+                mitigation: "Diversify supplier base and maintain 3-month inventory buffer"
+            },
+            {
+                id: 3,
+                name: "Economic Downturn",
+                category: "Financial",
+                likelihood: 2,
+                impact: 4,
+                description: "Reduced consumer spending affecting product demand",
+                mitigation: "Build cash reserves and develop lower-cost product alternatives"
+            },
+            {
+                id: 4,
+                name: "Key Employee Resignation",
+                category: "Strategic",
+                likelihood: 3,
+                impact: 3,
+                description: "Loss of institutional knowledge when senior staff leave",
+                mitigation: "Implement knowledge sharing programs and succession planning"
+            },
+            {
+                id: 5,
+                name: "Regulatory Changes",
+                category: "Compliance",
+                likelihood: 4,
+                impact: 2,
+                description: "New industry regulations requiring process changes",
+                mitigation: "Monitor regulatory landscape and allocate budget for compliance"
+            }
+        ];
+
+        // DOM elements
+        const riskForm = document.getElementById('riskForm');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const riskModal = document.getElementById('riskModal');
+        const closeModal = document.getElementById('closeModal');
+        const deleteRiskBtn = document.getElementById('deleteRisk');
+        const editRiskBtn = document.getElementById('editRisk');
+
+        // Risk counter
+        let riskCounter = risks.length > 0 ? Math.max(...risks.map(r => r.id)) + 1 : 1;
+        let currentRiskId = null;
+
+        // Initialize the heat map
+        function renderHeatMap(filter = 'all') {
+            // Clear all risk items
+            document.querySelectorAll('.risk-container').forEach(container => {
+                container.innerHTML = '';
+            });
+
+            // Filter risks if needed
+            const filteredRisks = filter === 'all' 
+                ? risks 
+                : risks.filter(risk => risk.category === filter);
+
+            // Add risks to their positions
+            filteredRisks.forEach(risk => {
+                const container = document.querySelector(`.heatmap-cell[data-impact="${risk.impact}"][data-likelihood="${risk.likelihood}"] .risk-container`);
+                if (container) {
+                    const riskEl = document.createElement('div');
+                    riskEl.className = `risk-item mb-1 p-2 rounded text-xs font-medium cursor-pointer ${getRiskColorClass(risk.likelihood, risk.impact)}`;
+                    riskEl.textContent = risk.name;
+                    riskEl.dataset.riskId = risk.id;
+                    riskEl.addEventListener('click', () => showRiskDetails(risk.id));
+                    
+                    container.appendChild(riskEl);
+                }
+            });
+        }
+
+        // Get appropriate color class based on likelihood and impact
+        function getRiskColorClass(likelihood, impact) {
+            const riskScore = likelihood * impact;
+            
+            if (riskScore >= 20) return 'bg-redMost-600 text-white';
+            if (riskScore >= 15) return 'bg-redMost-500 text-white';
+            if (riskScore >= 12) return 'bg-orangeMost-400 text-white';
+            if (riskScore >= 9) return 'bg-yellowMost-300 text-gray-800';
+            if (riskScore >= 6) return 'bg-greenMost-200 text-gray-800';
+            if (riskScore >= 3) return 'bg-greenMost-100 text-gray-800';
+            return 'bg-greenMost-50 text-gray-800';
+        }
+
+        // Show risk details in modal
+        function showRiskDetails(riskId) {
+            const risk = risks.find(r => r.id === riskId);
+            if (!risk) return;
+
+            currentRiskId = riskId;
+            
+            document.getElementById('modalRiskName').textContent = risk.name;
+            document.getElementById('modalRiskCategory').textContent = risk.category;
+            document.getElementById('modalRiskDescription').textContent = risk.description || 'No description provided';
+            document.getElementById('modalRiskMitigation').textContent = risk.mitigation || 'No mitigation strategy provided';
+            document.getElementById('modalRiskPosition').textContent = `Impact: ${risk.impact}, Likelihood: ${risk.likelihood}`;
+            
+            // Show likelihood and impact as visual indicators
+            const likelihoodEl = document.getElementById('modalRiskLikelihood');
+            likelihoodEl.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('span');
+                star.className = `inline-block w-4 h-4 rounded-full mx-px ${i <= risk.likelihood ? 'bg-blue-500' : 'bg-gray-200'}`;
+                likelihoodEl.appendChild(star);
+            }
+            likelihoodEl.innerHTML += ` <span class="ml-1">${getLikelihoodText(risk.likelihood)}</span>`;
+            
+            const impactEl = document.getElementById('modalRiskImpact');
+            impactEl.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('span');
+                star.className = `inline-block w-4 h-4 rounded-full mx-px ${i <= risk.impact ? 'bg-red-500' : 'bg-gray-200'}`;
+                impactEl.appendChild(star);
+            }
+            impactEl.innerHTML += ` <span class="ml-1">${getImpactText(risk.impact)}</span>`;
+            
+            riskModal.classList.remove('hidden');
+        }
+
+        // Helper functions for text labels
+        function getLikelihoodText(value) {
+            const labels = ['Very Low', 'Low', 'Medium', 'High', 'Very High'];
+            return labels[value - 1] || '';
+        }
+
+        function getImpactText(value) {
+            const labels = ['Very Low', 'Low', 'Medium', 'High', 'Very High'];
+            return labels[value - 1] || '';
+        }
+
+        // Close modal
+        function closeRiskModal() {
+            riskModal.classList.add('hidden');
+            currentRiskId = null;
+        }
+
+        // Filter risks by category
+        categoryFilter.addEventListener('change', (e) => {
+            renderHeatMap(e.target.value);
+        });
+
+        // Add new risk
+        riskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const risk = {
+                id: riskCounter++,
+                name: document.getElementById('riskName').value,
+                category: document.getElementById('riskCategory').value,
+                likelihood: parseInt(document.querySelector('input[name="likelihood"]:checked').value),
+                impact: parseInt(document.querySelector('input[name="impact"]:checked').value),
+                description: document.getElementById('riskDescription').value,
+                mitigation: document.getElementById('riskMitigation').value
+            };
+            
+            risks.push(risk);
+            renderHeatMap(categoryFilter.value);
+            riskForm.reset();
+        });
+
+        // Delete risk
+        deleteRiskBtn.addEventListener('click', () => {
+            if (currentRiskId) {
+                risks = risks.filter(risk => risk.id !== currentRiskId);
+                renderHeatMap(categoryFilter.value);
+                closeRiskModal();
+            }
+        });
+
+        // Close modal handlers
+        closeModal.addEventListener('click', closeRiskModal);
+        riskModal.addEventListener('click', (e) => {
+            if (e.target === riskModal) {
+                closeRiskModal();
+            }
+        });
+
+        // Edit risk (placeholder - would implement similar to add but with existing values)
+        editRiskBtn.addEventListener('click', () => {
+            if (currentRiskId) {
+                const risk = risks.find(r => r.id === currentRiskId);
+                if (risk) {
+                    // Populate form with existing values
+                    document.getElementById('riskName').value = risk.name;
+                    document.getElementById('riskCategory').value = risk.category;
+                    document.querySelector(`input[name="likelihood"][value="${risk.likelihood}"]`).checked = true;
+                    document.querySelector(`input[name="impact"][value="${risk.impact}"]`).checked = true;
+                    document.getElementById('riskDescription').value = risk.description || '';
+                    document.getElementById('riskMitigation').value = risk.mitigation || '';
+                    
+                    // Remove the risk and prepare for update
+                    risks = risks.filter(r => r.id !== currentRiskId);
+                    closeRiskModal();
+                }
+            }
+        });
+
+        // Initialize with sample data
+        document.addEventListener('DOMContentLoaded', () => {
+            renderHeatMap();
+        });
+    </script>
+</body>
+</html>

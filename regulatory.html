@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ComplyTeam Dashboard</title>
+    <link rel="stylesheet" href="css/regulatory.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+    <div>
+      <div class="logo">
+        <img src="img/LOGO.png" alt="Logo" />
+        <strong>SkinBloom</strong>
+      </div>
+      <nav>
+        <ul>
+          <li class="active"><span>🏠</span> <a href="regulatory.html">Dashboard</a></li>
+            <li><span>🔍</span> <a href="audit.html">Audit Logs</a></li>
+            <li><span>⚠️</span> <a href="findings.html">Findings</a></li>
+            <li><span>📁</span> <a href="documents.html">Documents</a></li>
+            <li><span>🚩</span> <a href="incident.html">Incidents</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="user">
+      <span>👤</span>
+      <div>
+        <strong>Jasper John Dreo</strong>
+        <small>Compliance</small>
+      </div>
+    </div>
+  </div>
+
+
+    <div class="main">
+        <div class="header">
+            Regulatory Compliance
+            <div class="search">
+                <input type="text" placeholder="Search..." />
+                <span>🔔</span>
+            </div>
+        </div>
+
+        <section class="stats">
+            <div class="card blue">Total Regulations <span>24</span></div>
+            <div class="card red">Non-Compliant <span>18</span></div>
+            <div class="card green">Compliant <span>6</span></div>
+            <div class="card yellow">Review Soon <span>3</span></div>
+        </section>
+
+        <section class="content">
+            <div class="row">
+                <div class="left">
+                    <h2>Compliance Status by Department</h2>
+                    <canvas id="complianceChart" height="200"></canvas>
+                </div>
+
+                <div class="right">
+                    <div class="pending-header">
+                        <h2>Pending Tasks</h2>
+                        <a href="#" class="view-all">View All</a>
+                    </div>
+                    <ul class="task-list">
+                        <li class="task-item blue">
+                            <span class="color-bar"></span>
+                            <div class="task-details">
+                                <strong>Update GDPR Data Processing Agreement</strong>
+                                <p>Due: August 16, 2025</p>
+                            </div>
+                            <span class="menu-icon">⋮</span>
+                        </li>
+                        <li class="task-item yellow">
+                            <span class="color-bar"></span>
+                            <div class="task-details">
+                                <strong>SOX Controls Testing</strong>
+                                <p>Due: August 31, 2025</p>
+                            </div>
+                            <span class="menu-icon">⋮</span>
+                        </li>
+                        <li class="task-item red">
+                            <span class="color-bar"></span>
+                            <div class="task-details">
+                                <strong>HIPAA Security Assessment</strong>
+                                <p>Due: September 12, 2025</p>
+                            </div>
+                            <span class="menu-icon">⋮</span>
+                        </li>
+                        <li class="task-item blue">
+                            <span class="color-bar"></span>
+                            <div class="task-details">
+                                <strong>CCPA Employee Training</strong>
+                                <p>Due: October 09, 2025</p>
+                            </div>
+                            <span class="menu-icon">⋮</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <section class="table">
+                <h2>Active Regulations</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Regulation Name</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th>Last Review</th>
+                            <th>Next Review</th>
+                            <th>Risk</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Product Labeling Law</td>
+                            <td>Regulatory Affairs</td>
+                            <td>Active</td>
+                            <td>02-03-2025</td>
+                            <td>02-03-2026</td>
+                            <td class="low">Low</td>
+                        </tr>
+                        <tr>
+                            <td>FDA Approval Process</td>
+                            <td>Quality Assurance</td>
+                            <td>Active</td>
+                            <td>10-11-2024</td>
+                            <td>10-11-2025</td>
+                            <td class="medium">Medium</td>
+                        </tr>
+                        <tr>
+                            <td>Data Privacy Act</td>
+                            <td>Legal</td>
+                            <td>Active</td>
+                            <td>15-12-2024</td>
+                            <td>15-12-2025</td>
+                            <td class="high">High</td>
+                        </tr>
+                        <tr>
+                            <td>Anti-Money Laundering</td>
+                            <td>Finance</td>
+                            <td>Active</td>
+                            <td>08-07-2025</td>
+                            <td>08-07-2026</td>
+                            <td class="medium">Medium</td>
+                        </tr>
+                        <tr>
+                            <td>Sarbanes-Oxley Act</td>
+                            <td>Finance</td>
+                            <td>Active</td>
+                            <td>01-01-2025</td>
+                            <td>01-01-2026</td>
+                            <td class="low">Low</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+           <div class="badges">
+        <h2>Regulations Overview</h2>
+        <div class="grid">
+            <div class="badge-item">
+            <div class="card-badge">
+                <img src="img/SOX.png" alt="SOX" class="logo" />
+                <div class="label">SOX - SARBANES-OXLEY ACT</div>
+            </div>
+            </div>
+
+            <div class="badge-item">
+            <div class="card-badge">
+                <img src="img/AML.png" alt="AML" class="logo" />
+                <div class="label">AML - ANTI-MONEY LAUNDERING</div>
+            </div>
+            </div>
+
+             <div class="badge-item">
+            <div class="card-badge">
+                <img src="img/BIR.png" alt="AML" class="logo" />
+                <div class="label">AML - ANTI-MONEY LAUNDERING</div>
+            </div>
+            </div>
+
+             <div class="badge-item">
+            <div class="card-badge">
+                <img src="img/ISO.png" alt="AML" class="logo" />
+                <div class="label">AML - ANTI-MONEY LAUNDERING</div>
+            </div>
+            </div>
+
+             <div class="badge-item">
+            <div class="card-badge">
+                <img src="img/GDPR.png" alt="AML" class="logo" />
+                <div class="label">AML - ANTI-MONEY LAUNDERING</div>
+            </div>
+            </div>
+
+             <div class="badge-item">
+            <div class="card-badge">
+                <img src="img/FDA.png" alt="AML" class="logo" />
+                <div class="label">AML - ANTI-MONEY LAUNDERING</div>
+            </div>
+            </div>
+
+             <div class="badge-item">
+            <div class="card-badge">
+                <img src="img/ECA.png" alt="AML" class="logo" />
+                <div class="label">AML - ANTI-MONEY LAUNDERING</div>
+            </div>
+            </div>
+
+             <div class="badge-item">
+            <div class="card-badge">
+                <img src="img/DPA.png" alt="AML" class="logo" />
+                <div class="label">AML - ANTI-MONEY LAUNDERING</div>
+            </div>
+            </div>
+
+            
+        </div>
+        </div>
+
+
+
+        </section>
+    </div>
+    <script src="script.js"></script> 
+    <script>
+        const ctx = document.getElementById('complianceChart').getContext('2d');
+        const complianceChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['HR', 'Finance', 'IT', 'Legal', 'Operations'],
+                datasets: [
+                    {
+                        label: 'Compliant',
+                        data: [5, 3, 6, 2, 4],
+                        backgroundColor: '#4caf50',
+                    },
+                    {
+                        label: 'Non-Compliant',
+                        data: [2, 4, 1, 3, 2],
+                        backgroundColor: '#f44336',
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                        },
+                    },
+                },
+            },
+        });
+    </script>
+</body>
+</html>

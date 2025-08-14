@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Incident Tracking</title>
+  <link rel="stylesheet" href="css/incident.css">
+
+
+
+</head>
+<body>
+
+  <div class="sidebar">
+    <div>
+      <div class="logo">
+        <img src="img/LOGO.png" alt="Logo" />
+        <strong>SkinBloom</strong>
+      </div>
+      <nav>
+        <ul>
+          <li><span>🏠</span> <a href="regulatory.html">Dashboard</a></li>
+          <li><span>🔍</span> <a href="audit.html">Audits</a></li>
+          <li><span>⚠️</span> <a href="findings.html">Findings</a></li>
+          <li><span>📁</span> <a href="documents.html">Documents</a></li>
+          <li class="active"><span>🚩</span> <a href="incident.html">Incidents</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="user">
+      <span>👤</span>
+      <div>
+        <strong>Jasper John Dreo</strong>
+        <small>Compliance</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <header>
+      <div>Incident Tracking</div>
+      <svg class="bell-icon" viewBox="0 0 24 24">
+        <path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 1 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+      </svg>
+    </header>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-content">
+          <span>Open Incidents</span>
+          <h3>24</h3>
+        </div>
+        <div class="card-icon-box blue">
+          <img src="https://img.icons8.com/color/48/000000/error--v1.png" />
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-content">
+          <span>Critical Priority</span>
+          <h3>8</h3>
+        </div>
+        <div class="card-icon-box red">
+          <img src="https://img.icons8.com/color/48/000000/high-priority.png" />
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-content">
+          <span>In Progress</span>
+          <h3>12</h3>
+        </div>
+        <div class="card-icon-box yellow">
+          <img src="https://img.icons8.com/color/48/000000/time-machine.png" />
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-content">
+          <span>Resolved</span>
+          <h3>42</h3>
+        </div>
+        <div class="card-icon-box green">
+          <img src="https://img.icons8.com/color/48/000000/checkmark--v1.png" />
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <div class="section-header">
+        <h2>Recent Incident Reports</h2>
+        <div class="buttons">
+          <button class="btn btn-filter">🔍 Filter</button>
+          <button class="btn btn-reports">📊 Reports</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Incident Type</th>
+            <th>Reported Date</th>
+            <th>Status</th>
+            <th>Severity</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="incident-table-body">
+          <!-- Rows will be loaded by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function loadIncidents() {
+      try {
+        const res = await fetch("/api/incidents");
+        const data = await res.json();
+
+        const tbody = document.getElementById("incident-table-body");
+        tbody.innerHTML = "";
+
+        data.forEach(row => {
+          tbody.innerHTML += `
+            <tr>
+              <td>${row.incident_type}</td>
+              <td>${row.date_reported}</td>
+              <td><span class="status-${row.status.toLowerCase()}">${row.status}</span></td>
+              <td>${row.severity_level}</td>
+              <td>
+                <button class="action-btn view-btn">View</button>
+                <button class="action-btn edit-btn">Edit</button>
+              </td>
+            </tr>
+          `;
+        });
+      } catch (err) {
+        console.error("Error loading incidents:", err);
+      }
+    }
+
+    loadIncidents();
+  </script>
+
+</body>
+</html>

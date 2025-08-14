@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Document Control</title>
+  <link rel="stylesheet" href="css/documents.css">
+</head>
+<body>
+
+  <div class="sidebar">
+    <div>
+      <div class="logo">
+        <img src="img/LOGO.png" alt="Logo" />
+        <strong>SkinBloom</strong>
+      </div>
+      <nav>
+        <ul>
+          <li><span>🏠</span> <a href="regulatory.html">Dashboard</a></li>
+          <li><span>🔍</span> <a href="audit.html">Audits</a></li>
+          <li><span>⚠️</span> <a href="findings.html">Findings</a></li>
+          <li class="active"><span>📁</span> <a href="documents.html">Documents</a></li>
+          <li><span>🚩</span> <a href="incident.html">Incidents</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="user">
+      <span>👤</span>
+      <div>
+        <strong>Jasper John Dreo</strong>
+        <small>Compliance</small>
+      </div>
+    </div>
+  </div>
+
+  <main class="main">
+    <header>
+      <div>Document Control</div>
+      <svg class="bell-icon" viewBox="0 0 24 24">
+        <path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4a1.5 1.5 0 1 0-3 0v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/>
+      </svg>
+    </header>
+
+    <section style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+      <div class="findings-header">
+        <h2>Documents</h2>
+        <div class="buttons">
+          <button class="add">+ upload</button>
+          <button class="filter"><span>🔍</span> Filter</button>
+          <button class="reports"><span>📊</span> Reports</button>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Document Name</th>
+            <th>Department Owner</th>
+            <th>Document Approved</th>
+            <th>Status</th>
+            <th>Last Validated</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <!-- Upload Modal -->
+  <div id="uploadModal" class="modal" style="display: none;">
+    <div class="modal-content styled-form">
+      <h3>📁 Upload Document</h3>
+      <form id="uploadForm" enctype="multipart/form-data">
+        <input type="text" name="document_name" placeholder="Document title" required />
+        <select name="owner_dept" required>
+          <option value="" disabled selected>Select Department</option>
+          <option>HR</option>
+          <option>Project Management</option>
+          <option>Sales & CRM</option>
+          <option>Manufacturing & Production Mgmt.</option>
+          <option>Inventory & Warehouse Mgmt.</option>
+          <option>Procurement</option>
+          <option>Finance and Accounting</option>
+          <option>Compliance & Risk Mgmt.</option>
+          <option>B.I. and Analytics</option>
+        </select>
+        <label>
+          <span>Choose File (PDF, DOCX, JPG)</span><br />
+          <input type="file" name="file" accept=".pdf,.docx,.jpg" required />
+        </label>
+        <div class="modal-buttons">
+          <button type="submit" class="upload-btn">Upload Document</button>
+          <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- View Modal -->
+  <div id="viewModal" class="modal" style="display:none;">
+    <div class="modal-content styled-form">
+      <h3>📄 Document Details</h3>
+      <p><strong>Document Name:</strong> <span id="viewDocName"></span></p>
+      <p><strong>Department Owner:</strong> <span id="viewOwner"></span></p>
+      <p><strong>Status:</strong> <span id="viewStatus"></span></p>
+      <p><strong>Document Approved:</strong> <span id="viewApprovedDate"></span></p>
+      <p><strong>Last Validated:</strong> <span id="viewLastValidated"></span></p>
+      <div class="modal-buttons">
+        <button id="approveBtn" class="upload-btn">Approve</button>
+        <button type="button" class="cancel-btn" onclick="closeViewModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentViewedDocId = null;
+
+    async function loadDocuments() {
+      try {
+        const res = await fetch('/documents');
+        const documents = await res.json();
+        const tbody = document.querySelector('tbody');
+        tbody.innerHTML = '';
+        documents.forEach(doc => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="document">${doc.document_name}</td>
+            <td>${doc.owner_dept}</td>
+            <td>${formatDate(doc.document_approved)}</td>
+            <td class="status">${doc.approval_status}</td>
+            <td>${formatDate(doc.last_review)}</td>
+            <td class="actions">
+              <a href="/download/${doc.document_id}">Download</a>
+              <a href="#" onclick="viewDetails(${doc.document_id})">View</a>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function viewDetails(id) {
+      currentViewedDocId = id;
+      try {
+        const res = await fetch(`/document/${id}`);
+        const doc = await res.json();
+        document.getElementById('viewDocName').textContent = doc.document_name;
+        document.getElementById('viewOwner').textContent = doc.owner_dept;
+        document.getElementById('viewStatus').textContent = doc.approval_status;
+        document.getElementById('viewApprovedDate').textContent = formatDate(doc.document_approved);
+        document.getElementById('viewLastValidated').textContent = formatDate(doc.last_review);
+        document.getElementById('approveBtn').onclick = () => approveDocument(id);
+        document.getElementById('viewModal').style.display = 'flex';
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function approveDocument(id) {
+      try {
+        const res = await fetch(`/approve/${id}`, { method: 'PUT' });
+        const data = await res.json();
+        document.getElementById('viewStatus').textContent = data.approval_status;
+        document.getElementById('viewApprovedDate').textContent = formatDate(data.document_approved);
+        document.getElementById('viewLastValidated').textContent = formatDate(data.last_review);
+        loadDocuments();
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function closeViewModal() {
+      if (currentViewedDocId) {
+        try {
+          await fetch(`/validate/${currentViewedDocId}`, { method: 'PUT' });
+        } catch (err) {
+          console.error('Error validating on close:', err);
+        }
+      }
+      document.getElementById('viewModal').style.display = 'none';
+      await loadDocuments();
+    }
+
+    function closeModal() {
+      document.getElementById('uploadModal').style.display = 'none';
+      document.getElementById('uploadForm').reset();
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return '—';
+      const date = new Date(dateString);
+      return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadDocuments();
+      document.querySelector('.buttons .add').addEventListener('click', () => {
+        document.getElementById('uploadModal').style.display = 'flex';
+      });
+      document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        try {
+          const res = await fetch('/upload', { method: 'POST', body: formData });
+          const data = await res.json();
+          alert('Document uploaded! ID: ' + data.document_id);
+          closeModal();
+          loadDocuments();
+        } catch (err) {
+          alert('Upload failed');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
